@@ -1,5 +1,14 @@
-<p align="center"> <a href="https://github.com/logpai"> <img src="https://github.com/logpai/logpai.github.io/blob/master/img/logpai_logo.jpg" width="425"></a></p>
+# Logparser Learning
+个人forked仓库，用于学习各种SOTA的Logparser的实现，阅读源码，添加注释。
 
+Personal forked repository, used to learn the SOTA logparsers implementation, read the source code, add comments.
+
+以下是原仓库内容 The following is the original content
+
+---
+
+
+<p align="center"><a href="https://github.com/logpai"> <img src="https://github.com/logpai/logpai.github.io/blob/master/img/logpai_logo.jpg" width="425"></a></p>
 
 # Logparser  
 [![Documentation Status](https://readthedocs.org/projects/logparser/badge/?version=latest)](https://logparser.readthedocs.io/en/latest/?badge=latest)

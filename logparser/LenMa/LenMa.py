@@ -4,7 +4,7 @@ Author: LogPAI team
 License: MIT
 """
 
-from templateminer import lenma_template 
+from .templateminer import lenma_template
 import pandas as pd
 import re
 import os

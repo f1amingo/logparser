@@ -4,7 +4,6 @@ Author: LogPAI team
 License: MIT
 """
 
-import sys
 import re
 import os
 import hashlib
@@ -13,7 +12,8 @@ from datetime import datetime
 from collections import defaultdict
 from functools import reduce
 
-class Event():
+
+class Event:
     def __init__(self, logidx, Eventstr=""):
         self.id = hashlib.md5(Eventstr.encode('utf-8')).hexdigest()[0:8]
         self.logs = [logidx]
@@ -25,22 +25,38 @@ class Event():
         self.id = hashlib.md5(self.Eventstr.encode('utf-8')).hexdigest()[0:8]
 
 
-class LogParser():
-    def __init__(self, indir, outdir, log_format, minEventCount=2, merge_percent=1, 
-                 rex=[], keep_para=True):
-        self.logformat = log_format
+class LogParser:
+
+    def __init__(self, indir, outdir, log_format, minEventCount=2, merge_percent=1,
+                 rex=None, keep_para=True):
+        """
+            indir: the input directory of log file
+            outdir: the output directory of parsing results
+            log_format: prior knowledge about the log format
+            minEventCount: the minimum number of events in a bin
+            merge_percent: the percentage of different tokens
+            rex: regular expressions used in preprocessing (step1)
+            keep_para:
+        """
         self.path = indir
         self.savePath = outdir
-        self.rex = rex
+        self.logformat = log_format
         self.minEventCount = minEventCount
         self.merge_percent = merge_percent
-        self.df_log = None
-        self.logname = None
-        self.merged_events = []
-        self.bins = defaultdict(dict)
+        if rex is None:
+            rex = []
+        self.rex = rex
         self.keep_para = keep_para
 
+        self.df_log = None
+        self.logname = None  # the log file name under $indir
+        self.merged_events = []
+        self.bins = defaultdict(dict)
+
     def parse(self, logname):
+        """
+            parse the $logname file under $indir
+        """
         start_time = datetime.now()
         print('Parsing file: ' + os.path.join(self.path, logname))
         self.logname = logname
@@ -52,10 +68,9 @@ class LogParser():
         print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
 
     def tokenize(self):
-        '''
-        Put logs into bins according to (# of '<*>', # of token)
-
-        '''
+        """
+            Put logs into bins according to (# of '<*>', # of token)
+        """
         for idx, log in self.df_log['Content_'].iteritems():
             para_count = 0
 
@@ -89,7 +104,6 @@ class LogParser():
                 if not matched:
                     abin['Events'].append(Event(logidx, log))
 
-
     def reconcile(self):
         '''
         Merge events if a bin has too many events
@@ -99,12 +113,12 @@ class LogParser():
             abin = self.bins[key]
             if len(abin['Events']) > self.minEventCount:
                 tobeMerged = []
-                for e1 in abin['Events']:   
+                for e1 in abin['Events']:
                     if e1.merged:
                         continue
                     e1.merged = True
                     tobeMerged.append([e1])
-                    
+
                     for e2 in abin['Events']:
                         if e2.merged:
                             continue
@@ -135,12 +149,11 @@ class LogParser():
 
         df_event = pd.DataFrame(df_events, columns=['EventId', 'EventTemplate', 'Occurrences'])
 
-
         self.df_log['EventId'] = idL
         self.df_log['EventTemplate'] = templateL
-        self.df_log.drop("Content_", axis=1, inplace=True)
+        # self.df_log.drop("Content_", axis=1, inplace=True)
         if self.keep_para:
-            self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1) 
+            self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1)
         self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_structured.csv'), index=False)
 
         occ_dict = dict(self.df_log['EventTemplate'].value_counts())
@@ -148,7 +161,8 @@ class LogParser():
         df_event['EventTemplate'] = self.df_log['EventTemplate'].unique()
         df_event['EventId'] = df_event['EventTemplate'].map(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[0:8])
         df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
-        df_event.to_csv(os.path.join(self.savePath, self.logname + '_templates.csv'), index=False, columns=["EventId", "EventTemplate", "Occurrences"])
+        df_event.to_csv(os.path.join(self.savePath, self.logname + '_templates.csv'), index=False,
+                        columns=["EventId", "EventTemplate", "Occurrences"])
 
     def merge_event(self, e1, e2):
         for pos in range(len(e1.EventToken)):
@@ -181,9 +195,28 @@ class LogParser():
         self.df_log = self.log_to_dataframe(os.path.join(self.path, self.logname), regex, headers, self.logformat)
         self.df_log['Content_'] = self.df_log['Content'].map(preprocess)
 
+    def generate_logformat_regex(self, logformat):
+        """
+            Function to generate regular expression to split log messages
+        """
+        headers = []
+        splitters = re.split(r'(<[^<>]+>)', logformat)
+        regex = ''
+        for k in range(len(splitters)):
+            if k % 2 == 0:
+                splitter = re.sub(' +', '\s+', splitters[k])
+                regex += splitter
+            else:
+                header = splitters[k].strip('<').strip('>')
+                regex += '(?P<%s>.*?)' % header
+                headers.append(header)
+        regex = re.compile('^' + regex + '$')
+        return headers, regex
 
     def log_to_dataframe(self, log_file, regex, headers, logformat):
-        ''' Function to transform log file to dataframe '''
+        """
+            Function to transform log file to dataframe
+        """
         log_messages = []
         linecount = 0
         with open(log_file, 'r') as fin:
@@ -199,25 +232,6 @@ class LogParser():
         logdf.insert(0, 'LineId', None)
         logdf['LineId'] = [i + 1 for i in range(linecount)]
         return logdf
-
-    def generate_logformat_regex(self, logformat):
-        ''' 
-        Function to generate regular expression to split log messages
-
-        '''
-        headers = []
-        splitters = re.split(r'(<[^<>]+>)', logformat)
-        regex = ''
-        for k in range(len(splitters)):
-            if k % 2 == 0:
-                splitter = re.sub(' +', '\s+', splitters[k])
-                regex += splitter
-            else:
-                header = splitters[k].strip('<').strip('>')
-                regex += '(?P<%s>.*?)' % header
-                headers.append(header)
-        regex = re.compile('^' + regex + '$')
-        return headers, regex
 
     def get_parameter_list(self, row):
         template_regex = re.sub(r"<.{1,5}>", "<*>", row["EventTemplate"])
