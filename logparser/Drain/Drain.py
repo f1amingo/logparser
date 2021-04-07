@@ -159,7 +159,6 @@ class LogParser:
 
         return retVal, numOfPar
 
-
     def fastMatch(self, logClustL, seq):
         retLogClust = None
 
@@ -224,7 +223,6 @@ class LogParser:
         df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
         df_event.to_csv(os.path.join(self.savePath, self.logName + '_templates.csv'), index=False, columns=["EventId", "EventTemplate", "Occurrences"])
 
-
     def printTree(self, node, dep):
         pStr = ''   
         for i in range(dep):
@@ -243,7 +241,6 @@ class LogParser:
             return 1
         for child in node.childD:
             self.printTree(node.childD[child], dep+1)
-
 
     def parse(self, logName):
         print('Parsing file: ' + os.path.join(self.path, logName))
@@ -313,7 +310,6 @@ class LogParser:
         logdf.insert(0, 'LineId', None)
         logdf['LineId'] = [i + 1 for i in range(linecount)]
         return logdf
-
 
     def generate_logformat_regex(self, logformat):
         """ Function to generate regular expression to split log messages

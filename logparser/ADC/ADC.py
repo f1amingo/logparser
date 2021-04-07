@@ -1,9 +1,3 @@
-"""
-Description: This file implements the AEL algorithm for log parsing
-Author: LogPAI team
-License: MIT
-"""
-
 import re
 import os
 import hashlib
@@ -61,31 +55,24 @@ class LogParser:
         self.logname = logname
         self.load_data()
         self.tokenize()
-        self.dump_content()
+        # self.dump_content()
+        self.dump()
         print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
 
     def tokenize(self):
-        self.df_log['tokens'] = self.df_log['Content'].map(str.split)
+        # tokenization
+        # self.df_log['tokens'] = self.df_log['Content'].map(str.split)
+        pass
 
     def dump_content(self):
         if not os.path.isdir(self.savePath):
             os.makedirs(self.savePath)
-        for _header in ['Date', 'Time', 'Pid', 'Level', 'Component']:
-            self.df_log.drop(_header, axis=1, inplace=True)
+        # 丢弃这几列
+        # for _header in ['Date', 'Time', 'Pid', 'Level', 'Component']:
+        #     self.df_log.drop(_header, axis=1, inplace=True)
         self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_content.csv'), index=False)
 
     def dump(self):
-        def get_parameter_list(row):
-            template_regex = re.sub(r"<.{1,5}>", "<*>", row["EventTemplate"])
-            if "<*>" not in template_regex: return []
-            template_regex = re.sub(r'([^A-Za-z0-9])', r'\\\1', template_regex)
-            template_regex = re.sub(r'\\ +', r'\s+', template_regex)
-            template_regex = "^" + template_regex.replace("\<\*\>", "(.*?)") + "$"
-            parameter_list = re.findall(template_regex, row["Content"])
-            parameter_list = parameter_list[0] if parameter_list else ()
-            parameter_list = list(parameter_list) if isinstance(parameter_list, tuple) else [parameter_list]
-            return parameter_list
-
         if not os.path.isdir(self.savePath):
             os.makedirs(self.savePath)
 
@@ -101,18 +88,18 @@ class LogParser:
 
         df_event = pd.DataFrame(df_events, columns=['EventId', 'EventTemplate', 'Occurrences'])
 
-        # self.df_log['EventId'] = idL
-        # self.df_log['EventTemplate'] = templateL
+        self.df_log['EventId'] = idL
+        self.df_log['EventTemplate'] = templateL
         # self.df_log.drop("Content_", axis=1, inplace=True)
         if self.keep_para:
-            self.df_log["ParameterList"] = self.df_log.apply(get_parameter_list, axis=1)
+            self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1)
         self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_structured.csv'), index=False)
 
-        # occ_dict = dict(self.df_log['EventTemplate'].value_counts())
+        occ_dict = dict(self.df_log['EventTemplate'].value_counts())
         df_event = pd.DataFrame()
-        # df_event['EventTemplate'] = self.df_log['EventTemplate'].unique()
-        # df_event['EventId'] = df_event['EventTemplate'].map(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[0:8])
-        # df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
+        df_event['EventTemplate'] = self.df_log['EventTemplate'].unique()
+        df_event['EventId'] = df_event['EventTemplate'].map(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[0:8])
+        df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
         df_event.to_csv(os.path.join(self.savePath, self.logname + '_templates.csv'), index=False,
                         columns=["EventId", "EventTemplate", "Occurrences"])
 
