@@ -1,5 +1,7 @@
+
 from typing import List
 import config
+
 import pandas as pd
 from collections import defaultdict
 
@@ -58,6 +60,7 @@ RULE_IDX = {}
 for idx, sym in enumerate(RULE_TABLE):
     RULE_IDX[sym] = idx
 bitmap = [0] * (len(RULE_TABLE) + 3)
+# bitmap = [0] * len(RULE_TABLE)
 result = defaultdict(list)
 for row in df.itertuples():
     this_bitmap = bitmap.copy()
@@ -83,5 +86,4 @@ result_more_than_ten = [template_list for template_list in result_details if len
 print(len(result_details))
 print(result_more_than_ten)
 
-# f = ['E9', 'E15', 'E12', 'E8', 'E14', 'E13']
-# df[df['EventId'].isin(f)]['Content']
+
