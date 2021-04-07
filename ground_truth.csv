@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 LineId,Date,Time,Pid,Tid,Level,Component,Content,EventId,EventTemplate
 2,03-17,16:13:38.819,1702,8671,D,PowerManagerService,"acquire lock=233570404, flags=0x1, tag=""View Lock"", name=com.android.systemui, ws=null, uid=10037, pid=2227",E10,"acquire lock=<*>, flags=<*>, tag=""<*>"", name=<*>, ws=<*>, uid=<*>, pid=<*>"
+=======
+LineId,Date,Time,Pid,Tid,Level,Component,Content,EventId,EventTemplate
+2,03-17,16:13:38.819,1702,8671,D,PowerManagerService,"acquire lock=233570404, flags=0x1, tag=""View Lock"", name=com.android.systemui, ws=null, uid=10037, pid=2227",E10,"acquire lock=<*>, flags=<*>, tag=""<*>"", name=<*>, ws=<*>, uid=<*>, pid=<*>"
+>>>>>>> ef98b6dc1ee508ff3a82c9b14e7856626069661c
 3,03-17,16:13:38.819,1702,8671,D,PowerManagerService,"acquire lock=233570404, flags=0x1, tag=""View Lock"", name=com.android.systemui, ws=null, uid=10037, pid=2227",E10,"acquire lock=<*>, flags=<*>, tag=""<*>"", name=<*>, ws=<*>, uid=<*>, pid=<*>"
