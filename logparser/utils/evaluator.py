@@ -7,7 +7,7 @@ License     : MIT
 import sys
 import pandas as pd
 from collections import defaultdict
-import scipy.misc
+import scipy.special
 
 
 def evaluate(groundtruth, parsedresult):
@@ -24,7 +24,7 @@ def evaluate(groundtruth, parsedresult):
     -------
         f_measure : float
         accuracy : float
-    """ 
+    """
     df_groundtruth = pd.read_csv(groundtruth)
     df_parsedlog = pd.read_csv(parsedresult)
     # Remove invalid groundtruth event Ids
@@ -32,8 +32,10 @@ def evaluate(groundtruth, parsedresult):
     df_groundtruth = df_groundtruth.loc[non_empty_log_ids]
     df_parsedlog = df_parsedlog.loc[non_empty_log_ids]
     (precision, recall, f_measure, accuracy) = get_accuracy(df_groundtruth['EventId'], df_parsedlog['EventId'])
-    print('Precision: %.4f, Recall: %.4f, F1_measure: %.4f, Parsing_Accuracy: %.4f'%(precision, recall, f_measure, accuracy))
+    print('Precision: %.4f, Recall: %.4f, F1_measure: %.4f, Parsing_Accuracy: %.4f' % (
+        precision, recall, f_measure, accuracy))
     return f_measure, accuracy
+
 
 def get_accuracy(series_groundtruth, series_parsedlog, debug=False):
     """ Compute accuracy metrics between log parsing results and ground truth
@@ -58,41 +60,45 @@ def get_accuracy(series_groundtruth, series_parsedlog, debug=False):
     real_pairs = 0
     for count in series_groundtruth_valuecounts:
         if count > 1:
-            real_pairs += scipy.misc.comb(count, 2)
+            # real_pairs += scipy.misc.comb(count, 2)
+            real_pairs += scipy.special.comb(count, 2)
 
     series_parsedlog_valuecounts = series_parsedlog.value_counts()
     parsed_pairs = 0
     for count in series_parsedlog_valuecounts:
         if count > 1:
-            parsed_pairs += scipy.misc.comb(count, 2)
+            # parsed_pairs += scipy.misc.comb(count, 2)
+            parsed_pairs += scipy.special.comb(count, 2)
 
     accurate_pairs = 0
-    accurate_events = 0 # determine how many lines are correctly parsed
+    accurate_events = 0  # determine how many lines are correctly parsed
     for parsed_eventId in series_parsedlog_valuecounts.index:
+        # 类型为E6的日志id列表
         logIds = series_parsedlog[series_parsedlog == parsed_eventId].index
+        # logIds中的日志被解析成了哪些类型
         series_groundtruth_logId_valuecounts = series_groundtruth[logIds].value_counts()
+        # ('E6',['5d5de21c'])
+        # E6被解析成了这些类型
         error_eventIds = (parsed_eventId, series_groundtruth_logId_valuecounts.index.tolist())
         error = True
+        # 所有的E6都被解析成了同一类型
         if series_groundtruth_logId_valuecounts.size == 1:
+            # E6被解析成了'5d5de21c'
             groundtruth_eventId = series_groundtruth_logId_valuecounts.index[0]
+            # E6的数量和5d5de21c的数量相同
             if logIds.size == series_groundtruth[series_groundtruth == groundtruth_eventId].size:
+                # 认为解析正确
                 accurate_events += logIds.size
                 error = False
         if error and debug:
             print('(parsed_eventId, groundtruth_eventId) =', error_eventIds, 'failed', logIds.size, 'messages')
         for count in series_groundtruth_logId_valuecounts:
             if count > 1:
-                accurate_pairs += scipy.misc.comb(count, 2)
+                # accurate_pairs += scipy.misc.comb(count, 2)
+                accurate_pairs += scipy.special.comb(count, 2)
 
     precision = float(accurate_pairs) / parsed_pairs
     recall = float(accurate_pairs) / real_pairs
     f_measure = 2 * precision * recall / (precision + recall)
     accuracy = float(accurate_events) / series_groundtruth.size
     return precision, recall, f_measure, accuracy
-
-
-
-
-
-
-
