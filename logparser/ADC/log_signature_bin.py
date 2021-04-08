@@ -1,7 +1,9 @@
 from typing import List
 import config
 import pandas as pd
+import os
 from collections import defaultdict
+from logparser import evaluator
 
 
 def LCS(seq1, seq2):
@@ -96,9 +98,7 @@ def calc_signature(content: str) -> int:
             if this_bitmap[idx] == 0:
                 is_match = RULE_TABLE[rule](token)
                 this_bitmap[idx] = int(is_match)
-    # 最后两位为0，用于累加桶中序号
-    # 因此一个桶中最多能有100个不同模板
-    return _bitmap_to_number(this_bitmap) * 100
+    return _bitmap_to_number(this_bitmap)
 
 
 # 返回类型编号
@@ -121,23 +121,34 @@ def insert_into_bin(content: str, bin_list: List, logId) -> int:
         return match_idx
 
 
+# 读入数据
 this_dataset = config.DATASET.Hadoop.value
 CSV_FILE_PATH = '../../logs/%s/%s_2k.log_structured.csv' % (this_dataset, this_dataset)
 df = pd.read_csv(CSV_FILE_PATH)
 # 可能不存在
-df.drop(['Date', 'Time', 'Pid', 'Level', 'Component'], axis=1, inplace=True, errors='ignore')
+df.drop(['Date', 'Time', 'Pid', 'Level', 'Component', 'EventId'], axis=1, inplace=True, errors='ignore')
 # df.drop_duplicates(subset=['EventId'], keep='first', inplace=True)
 
 result = defaultdict(list)
 bin_list = defaultdict(list)
+parsed_event_id = pd.Series([0] * len(df))
 # 开始解析每一行
-for row in df.itertuples():
+for idx, row in enumerate(df.itertuples()):
     this_signature = calc_signature(row.Content)
-    result[this_signature].append(row.EventId)
+    # result[this_signature].append(row.EventId)
     bin_idx = insert_into_bin(row.Content, bin_list[this_signature], row.LineId)
+    parsed_event_id[idx] = this_signature * 100 + bin_idx
 
-result_details = [df[df['EventId'].isin(result[sig])]['Content'].tolist() for sig in result]
-result_more_than_ten = [template_list for template_list in result_details if len(template_list) > 10]
+# result_details = [df[df['EventId'].isin(result[sig])]['Content'].tolist() for sig in result]
+# result_more_than_ten = [template_list for template_list in result_details if len(template_list) > 10]
 
-print(len(result_details))
-print(result_more_than_ten)
+df['EventId'] = parsed_event_id
+
+# df.sort_values('EventId').to_csv('./test.csv')
+df.to_csv('./test.csv')
+
+F1_measure, accuracy = evaluator.evaluate(CSV_FILE_PATH, './test.csv')
+print(F1_measure, accuracy)
+
+# print(len(result_details))
+# print(result_more_than_ten)

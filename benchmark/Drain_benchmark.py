@@ -1,10 +1,8 @@
 import pandas as pd
 import os
-
-import sys
-
-sys.path.append('../')
-from logparser import Drain, evaluator
+from logparser import evaluator
+from logparser import Drain
+from logparser.ADC import ADC_Drain as Drain
 
 input_dir = '../logs/'  # The input directory of log file
 output_dir = 'Drain_result/'  # The output directory of parsing results
