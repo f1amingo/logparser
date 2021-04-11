@@ -4,10 +4,10 @@ import sys
 sys.path.append('../')
 from logparser import IPLoM
 
-input_dir    = '../logs/HDFS/'  # The input directory of log file
+input_dir    = '../logs/HDFS_/'  # The input directory of log file
 output_dir   = 'IPLoM_result/'  # The output directory of parsing results
 log_file     = 'HDFS_2k.log'  # The input log file name
-log_format   = '<Date> <Time> <Pid> <Level> <Component>: <Content>'  # HDFS log format
+log_format   = '<Date> <Time> <Pid> <Level> <Component>: <Content>'  # HDFS_ log format
 maxEventLen  = 120  # The maximal token number of log messages (default: 200)
 step2Support = 0  # The minimal support for creating a new partition (default: 0)
 CT           = 0.35  # The cluster goodness threshold (default: 0.35)

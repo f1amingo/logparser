@@ -8,8 +8,8 @@ input_dir = '../logs/'  # The input directory of log file
 output_dir = 'Drain_result/'  # The output directory of parsing results
 
 benchmark_settings = {
-    'HDFS': {
-        'log_file': 'HDFS/HDFS_2k.log',
+    'HDFS_': {
+        'log_file': 'HDFS_/HDFS_2k.log',
         'log_format': '<Date> <Time> <Pid> <Level> <Component>: <Content>',
         'regex': [r'blk_-?\d+', r'(\d+\.){3}\d+(:\d+)?'],
         'st': 0.5,

@@ -2,7 +2,9 @@ from typing import List
 
 # 字符级别规则
 RULE_TABLE = {
-    ' ': lambda t: ' ' in t,
+    # ' ': lambda t: ' ' in t,
+    # '.': lambda t: '.' in t,
+    # '-': lambda t: '-' in t,
     '_': lambda t: '_' in t,
     '*': lambda t: '*' in t,
     ':': lambda t: ':' in t,
@@ -10,9 +12,7 @@ RULE_TABLE = {
     '(': lambda t: '(' in t,
     '{': lambda t: '{' in t,
     '[': lambda t: '[' in t,
-    '.': lambda t: '.' in t,
     '=': lambda t: '=' in t,
-    '-': lambda t: '-' in t,
     '+': lambda t: '+' in t,
     ',': lambda t: ',' in t,
     '\'': lambda t: '\'' in t,
@@ -26,7 +26,6 @@ RULE_TABLE = {
     '@': lambda t: '@' in t,
     '|': lambda t: '|' in t,
     '#': lambda t: '#' in t,
-    # 'ip': lambda t: re.match(r'(\d+\.){3}\d+(:\d+)?', t) is not None,
 }
 # 根据符号查询数组下标
 RULE_IDX = {}

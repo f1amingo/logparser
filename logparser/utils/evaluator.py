@@ -37,7 +37,7 @@ def evaluate(groundtruth, parsedresult):
     return f_measure, accuracy
 
 
-def get_accuracy(series_groundtruth, series_parsedlog, debug=False):
+def get_accuracy(series_groundtruth, series_parsedlog, debug=True):
     """ Compute accuracy metrics between log parsing results and ground truth
     
     Arguments

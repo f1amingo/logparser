@@ -3,7 +3,7 @@ from enum import Enum, unique
 
 @unique
 class DATASET(Enum):
-    HDFS = 'HDFS'
+    HDFS = 'HDFS_'
     Hadoop = 'Hadoop'
     Spark = 'Spark'
     Zookeeper = 'Zookeeper'

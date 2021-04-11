@@ -68,7 +68,7 @@ class LogParser:
         seq_len = len(token_list)
         # 长度层，判断长度
         if seq_len not in root.childD:
-            return None
+            return 0, None
         len_node = root.childD[seq_len]  # 长度层的节点
         depth = 1
         for token in token_list:
@@ -79,7 +79,7 @@ class LogParser:
             elif '<*>' in len_node.childD:
                 len_node = len_node.childD['<*>']
             else:
-                return None
+                return 0, None
             depth += 1
         return self.fastMatch(len_node.childD, token_list)
 
@@ -166,18 +166,30 @@ class LogParser:
         maxSim = -1
         maxNumOfPara = -1
         maxClust = None
+        maxIdx = -1  # 匹配的簇对应的索引
 
-        for logClust in logClustL:
+        for i, logClust in enumerate(logClustL):
             curSim, curNumOfPara = self.seqDist(logClust.template_token_list, seq)
             if curSim > maxSim or (curSim == maxSim and curNumOfPara > maxNumOfPara):
                 maxSim = curSim
                 maxNumOfPara = curNumOfPara
                 maxClust = logClust
+                maxIdx = i
 
-        if maxSim >= self.st:
-            retLogClust = maxClust
+        if maxSim < self.st:
+            return len(logClustL), None
+        else:
+            return maxIdx, maxClust
+        # if maxSim >= self.st:
+        #     retLogClust = maxClust
+        # return retLogClust
 
-        return retLogClust
+    # 输出自定义结果
+    def outputEventId(self, event_id_list):
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
+        self.df_log['EventId'] = event_id_list
+        self.df_log.to_csv(os.path.join(self.save_path, self.log_name + '_structured.csv'), index=False)
 
     def outputResult(self, logClustL):
         if not os.path.exists(self.save_path):
@@ -237,32 +249,31 @@ class LogParser:
         self.log_name = log_name
         # root_node = Node()
         all_cluster_list = []  # 所有的logCluster
-
         sig_bin = {}
+        # 保存解析的EventId
+        event_id_list = []
 
         self.load_data()
 
         # 遍历每一行
         for idx, line in self.df_log.iterrows():
-
-            sig = calc_signature(line['Content'])  # 计算签名
-            if sig not in sig_bin:
-                sig_bin[sig] = Node()
-            this_root = sig_bin[sig]  # 每个签名对应一颗树
-
+            log_content = line['Content']
             log_id = line['LineId']
-            # 预处理
-            log_token_list = self.preprocess(line['Content']).strip().split()
-
-            # sig = calc_signature(' '.join(log_token_list))  # 计算签名
-            # if sig not in sig_bin:
-            #     sig_bin[sig] = Node()
-            # this_root = sig_bin[sig]  # 每个签名对应一颗树
+            # 预处理，token化
+            log_token_list = self.preprocess(log_content).strip().split()
+            # 计算签名
+            # log_sig = calc_signature(log_content)
+            log_sig = 0
+            if log_sig not in sig_bin:
+                sig_bin[log_sig] = Node()
+            # 每个签名对应一颗树
+            this_root = sig_bin[log_sig]
 
             # 搜索树，找到匹配的Cluster
             # matched_cluster = self.tree_search(root_node, log_token_list)
-            matched_cluster = self.tree_search(this_root, log_token_list)
-
+            match_idx, matched_cluster = self.tree_search(this_root, log_token_list)
+            parsed_event_id = log_sig * 100 + match_idx
+            event_id_list.append(parsed_event_id)
             if matched_cluster is None:
                 # 没有匹配的 Cluster
                 new_cluster = LogCluster(template_token_list=log_token_list, log_id_list=[log_id])
@@ -280,7 +291,8 @@ class LogParser:
             if count % 1000 == 0 or count == len(self.df_log):
                 print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)))
 
-        self.outputResult(all_cluster_list)
+        self.outputEventId(event_id_list)
+        # self.outputResult(all_cluster_list)
         print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
 
     def load_data(self):

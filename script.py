@@ -1,33 +1,39 @@
-N = int(input())
-graph = [[0] * N for _ in range(N)]
-nameIdx = {}
-this_idx = 0
-for _ in range(N):
-    name1, name2 = input().split()
-    if name1 not in nameIdx:
-        nameIdx[name1] = this_idx
-        this_idx += 1
-    if name2 not in nameIdx:
-        nameIdx[name2] = this_idx
-        this_idx += 1
-    i, j = nameIdx[name1], nameIdx[name2]
-    graph[i][j] = graph[j][i] = 1
+# a = [
+#     'PacketResponder <*> for block <*> terminating',
+#     'BLOCK* NameSystem.addStoredBlock blockMap updated <*> 50010 is added to <*> size <*>',
+#     'Received block <*> of size <*> from <*>',
+#     'Receiving block <*> src <*> <*> dest <*> 50010',
+#     'BLOCK* NameSystem.allocateBlock <*>',
+#     'Verification succeeded for <*>',
+#     '<*> 50010 Served block <*> to <*>',
+#     '<*> 50010 Got exception while serving <*> to <*>',
+#     'BLOCK* NameSystem.delete <*> is added to invalidSet of <*> 50010',
+#     'Deleting block <*> file <*>',
+#     '10.250.15.198 50010 Starting thread to transfer block blk_4292382298896622412 to 10.250.15.240 50010',
+#     'BLOCK* ask <*> 50010 to delete <*>',
+#     'BLOCK* ask 10.250.14.38 50010 to replicate blk_-7571492020523929240 to datanode(s) 10.251.122.38 50010',
+#     'Received block <*> src <*> <*> dest <*> 50010 of size 67108864'
+# ]
 
-visit = set()
-queue = []
-
-
-def dfs(start: int):
-    if start not in visit:
-        visit.add(start)
-        for j in range(N):
-            if graph[start][j] == 1 and j not in visit:
-                dfs(j)
-
-
-ans = 0
-for i in range(N):
-    if i not in visit:
-        dfs(i)
-        ans += 1
-print(ans)
+b = [
+     'PacketResponder <*> for block <*> terminating',
+     'PacketResponder <*> for block <*> terminating',
+     'BLOCK* NameSystem.addStoredBlock blockMap updated <*> 50010 is added to <*> size <*>',
+     'Received block <*> of size <*> from <*>',
+     'Receiving block <*> src <*> <*> dest <*> 50010',
+     'Receiving block <*> src <*> <*> dest <*> 50010',
+     'BLOCK* NameSystem.allocateBlock <*>',
+     'Received block <*> of size <*> from <*>',
+     'BLOCK* NameSystem.addStoredBlock blockMap updated <*> 50010 is added to <*> size <*>',
+     'Verification succeeded for <*>', '<*> 50010 Served block <*> to <*>',
+     '<*> 50010 Got exception while serving <*> to <*>',
+     '<*> 50010 Got exception while serving <*> to <*>',
+     '<*> 50010 Served block <*> to <*>',
+     'Verification succeeded for <*>',
+     'BLOCK* NameSystem.delete <*> is added to invalidSet of <*> 50010',
+     'BLOCK* NameSystem.delete <*> is added to invalidSet of <*> 50010',
+     'Deleting block <*> file <*>',
+     'Deleting block <*> file <*>',
+     '10.250.15.198 50010 Starting thread to transfer block blk_4292382298896622412 to 10.250.15.240 50010',
+     'BLOCK* ask 10.250.14.38 50010 to replicate blk_-7571492020523929240 to datanode(s) 10.251.122.38 50010'
+     ]
