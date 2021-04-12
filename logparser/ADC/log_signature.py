@@ -2,10 +2,10 @@ from typing import List
 
 # 字符级别规则
 RULE_TABLE = {
-    ' ': lambda t: ' ' in t,
+    # '-': lambda t: '-' in t, don't use this
+
     '.': lambda t: '.' in t,
-    '-': lambda t: '-' in t,
-    '_': lambda t: '_' in t,
+    # '_': lambda t: '_' in t,
     '*': lambda t: '*' in t,
     ':': lambda t: ':' in t,
     '/': lambda t: '/' in t,
@@ -14,11 +14,11 @@ RULE_TABLE = {
     '[': lambda t: '[' in t,
     '=': lambda t: '=' in t,
     '+': lambda t: '+' in t,
-    ',': lambda t: ',' in t,
+    # ',': lambda t: ',' in t,
     '\'': lambda t: '\'' in t,
     '"': lambda t: '"' in t,
     ';': lambda t: ';' in t,
-    '?': lambda t: '?' in t,
+    # '?': lambda t: '?' in t,
     '!': lambda t: '!' in t,
     '$': lambda t: '$' in t,
     '<': lambda t: '<' in t,
@@ -34,7 +34,6 @@ for idx, sym in enumerate(RULE_TABLE):
 # 位图
 # -1 -2 -3几个索引分别表示 token 数量为1 2 3
 BITMAP = [0] * (len(RULE_TABLE) + 3)
-
 
 def calc_signature(content: str) -> int:
     def _bitmap_to_number(_bitmap: List):
