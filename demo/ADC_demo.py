@@ -1,23 +1,29 @@
 import os
 from logparser import evaluator
-# from logparser import ADC
+from benchmark.Drain_benchmark import benchmark_settings
 import logparser.ADC.ADC_Drain as Drain
+
+# from logparser import ADC
 # import logparser.ADC.ADC_Spell as Spell
 
-input_dir = '../logs/HDFS_/'  # The input directory of log file
+# The input directory of log file
 output_dir = 'ADC_result/'  # The output directory of parsing results
-log_file = 'HDFS_2k.log'  # The input log file name
-log_format = '<Date> <Time> <Pid> <Level> <Component>: <Content>'  # HDFS_ log format
-minEventCount = 2  # The minimum number of events in a bin
-merge_percent = 0.5  # The percentage of different tokens
-# match blockId and IP(10.251.110.8:50010)
-regex = [r'blk_-?\d+', r'(\d+\.){3}\d+(:\d+)?']  # Regular expression list for optional preprocessing (default: [])
+one_setting = benchmark_settings['HPC']
+log_file = os.path.basename(one_setting['log_file'])
+input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 
 # parser = Drain.LogParser(input_dir, output_dir, log_format, rex=regex, keep_para=False,
 #                        minEventCount=minEventCount, merge_percent=merge_percent)
 
 # ADC_Drain
-parser = Drain.LogParser(log_format, indir=input_dir, outdir=output_dir, depth=4, st=0.5, rex=regex)
+parser = Drain.LogParser(
+    log_format=one_setting['log_format'],
+    indir=input_dir,
+    outdir=output_dir,
+    depth=one_setting['depth'],
+    st=one_setting['st'],
+    rex=one_setting['regex']
+)
 
 # ADC_Spell
 # parser = Spell.LogParser(indir=input_dir, outdir=output_dir, log_format=log_format, tau=0.5, rex=[])
@@ -28,4 +34,5 @@ F1_measure, accuracy = evaluator.evaluate(
     groundtruth=os.path.join(input_dir, log_file + '_structured.csv'),
     parsedresult=os.path.join(output_dir, log_file + '_structured.csv'),
 )
+
 print(F1_measure, accuracy)

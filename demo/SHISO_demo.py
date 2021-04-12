@@ -3,10 +3,10 @@ import sys
 sys.path.append('../')
 from logparser import SHISO
 
-input_dir   = '../logs/HDFS_/'  # The input directory of log file
+input_dir   = '../logs/HDFS/'  # The input directory of log file
 output_dir  = 'SHISO_result/' # The output directory of parsing results
 log_file    = 'HDFS_2k.log' # The input log file name
-log_format  = '<Date> <Time> <Pid> <Level> <Component>: <Content>' # HDFS_ log format
+log_format  = '<Date> <Time> <Pid> <Level> <Component>: <Content>' # HDFS log format
 regex       = [r'blk_-?\d+', r'(\d+\.){3}\d+(:\d+)?'] # Regular expression list for optional preprocessing (default: [])
 maxChildNum = 4 # The maximum number of children for each internal node
 mergeThreshold = 0.1 # Threshold for searching the most similar template in the children

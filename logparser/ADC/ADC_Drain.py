@@ -269,8 +269,8 @@ class LogParser:
             # 预处理，token化
             log_token_list = self.preprocess(log_content).strip().split()
             # 计算签名
-            log_sig = calc_signature(log_content)
-            # log_sig = 0
+            # log_sig = calc_signature(log_content)
+            log_sig = 0
             if log_sig not in sig_bin:
                 sig_bin[log_sig] = Node()
             # 每个签名对应一颗树

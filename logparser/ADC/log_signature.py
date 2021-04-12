@@ -2,9 +2,9 @@ from typing import List
 
 # 字符级别规则
 RULE_TABLE = {
-    # ' ': lambda t: ' ' in t,
-    # '.': lambda t: '.' in t,
-    # '-': lambda t: '-' in t,
+    ' ': lambda t: ' ' in t,
+    '.': lambda t: '.' in t,
+    '-': lambda t: '-' in t,
     '_': lambda t: '_' in t,
     '*': lambda t: '*' in t,
     ':': lambda t: ':' in t,
