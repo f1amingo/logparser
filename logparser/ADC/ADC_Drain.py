@@ -18,6 +18,7 @@ class LogCluster:
     def __init__(self, template_token_list: List[str], log_id_list: List[int]):
         self.template_token_list = template_token_list
         self.log_id_list = log_id_list
+        self.template_id = None
 
 
 # 树节点
@@ -26,6 +27,7 @@ class Node:
         self.childD = {} if childD is None else childD
         self.depth = depth
         self.digitOrToken = digitOrToken
+        self.template_count = 0
 
 
 def get_template(seq1, seq2):
@@ -86,6 +88,9 @@ class LogParser:
     def addSeqToPrefixTree(self, rn, logClust):
         def has_number(s):
             return any(char.isdigit() for char in s)
+
+        logClust.template_id = rn.template_count  # 模板id等于序号
+        rn.template_count += 1  # 这个根上的模板总数加一
 
         seqLen = len(logClust.template_token_list)
         if seqLen not in rn.childD:
@@ -201,7 +206,8 @@ class LogParser:
         for logClust in logClustL:
             template_str = ' '.join(logClust.template_token_list)
             occurrence = len(logClust.log_id_list)
-            template_id = hashlib.md5(template_str.encode('utf-8')).hexdigest()[0:8]
+            # template_id = hashlib.md5(template_str.encode('utf-8')).hexdigest()[0:8]
+            template_id = logClust.template_id
             for log_id in logClust.log_id_list:
                 log_id -= 1
                 log_templates[log_id] = template_str
@@ -220,6 +226,7 @@ class LogParser:
         df_event = pd.DataFrame()
         df_event['EventTemplate'] = self.df_log['EventTemplate'].unique()
         df_event['EventId'] = df_event['EventTemplate'].map(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[0:8])
+        # df_event['EventId'] = self.df_log['EventId'].unique()
         df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
         df_event.to_csv(os.path.join(self.save_path, self.log_name + '_templates.csv'), index=False,
                         columns=["EventId", "EventTemplate", "Occurrences"])
@@ -262,8 +269,8 @@ class LogParser:
             # 预处理，token化
             log_token_list = self.preprocess(log_content).strip().split()
             # 计算签名
-            # log_sig = calc_signature(log_content)
-            log_sig = 0
+            log_sig = calc_signature(log_content)
+            # log_sig = 0
             if log_sig not in sig_bin:
                 sig_bin[log_sig] = Node()
             # 每个签名对应一颗树
@@ -272,20 +279,27 @@ class LogParser:
             # 搜索树，找到匹配的Cluster
             # matched_cluster = self.tree_search(root_node, log_token_list)
             match_idx, matched_cluster = self.tree_search(this_root, log_token_list)
-            parsed_event_id = log_sig * 100 + match_idx
-            event_id_list.append(parsed_event_id)
+            # parsed_event_id = log_sig * 100 + matched_cluster.template_id
+            # event_id_list.append(parsed_event_id)
+            # cluster_template_id = matched_cluster.template_id
             if matched_cluster is None:
                 # 没有匹配的 Cluster
                 new_cluster = LogCluster(template_token_list=log_token_list, log_id_list=[log_id])
                 all_cluster_list.append(new_cluster)
                 # self.addSeqToPrefixTree(root_node, new_cluster)
                 self.addSeqToPrefixTree(this_root, new_cluster)
+
+                cluster_template_id = new_cluster.template_id
             else:
                 # 把日志消息添加到已有的 Cluster
                 new_template_token_list = get_template(log_token_list, matched_cluster.template_token_list)
                 matched_cluster.log_id_list.append(log_id)
                 if ' '.join(new_template_token_list) != ' '.join(matched_cluster.template_token_list):
                     matched_cluster.template_token_list = new_template_token_list
+
+                cluster_template_id = matched_cluster.template_id
+
+            event_id_list.append(log_sig * 100 + cluster_template_id)
 
             count = idx + 1
             if count % 1000 == 0 or count == len(self.df_log):
