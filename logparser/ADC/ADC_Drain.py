@@ -102,14 +102,15 @@ class LogParser:
         parentn = firtLayerNode
 
         currentDepth = 1
+        # 只有一个token时，结果是不对的
         for token in logClust.template_token_list:
 
             # Add current log cluster to the leaf node
             if currentDepth >= self.depth or currentDepth > seqLen:
-                if len(parentn.childD) == 0:
-                    parentn.childD = [logClust]
-                else:
-                    parentn.childD.append(logClust)
+                # if len(parentn.childD) == 0:
+                #     parentn.childD = [logClust]
+                # else:
+                #     parentn.childD.append(logClust)
                 break
 
             # If token not matched in this layer of existing tree. 
@@ -147,6 +148,12 @@ class LogParser:
                 parentn = parentn.childD[token]
 
             currentDepth += 1
+
+        # 添加到 logClusterList
+        if len(parentn.childD) == 0:
+            parentn.childD = [logClust]
+        else:
+            parentn.childD.append(logClust)
 
     # seq1 is template
     def seqDist(self, seq1, seq2):

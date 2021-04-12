@@ -8,7 +8,7 @@ import logparser.ADC.ADC_Drain as Drain
 
 # The input directory of log file
 output_dir = 'ADC_result/'  # The output directory of parsing results
-one_setting = benchmark_settings['HPC']
+one_setting = benchmark_settings['Linux']
 log_file = os.path.basename(one_setting['log_file'])
 input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 
