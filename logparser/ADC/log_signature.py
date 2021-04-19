@@ -5,14 +5,14 @@ RULE_TABLE = {
     # '-': lambda t: '-' in t,  # don't use this
 
     '.': lambda t: '.' in t,
-    '_': lambda t: '_' in t,
+    # '_': lambda t: '_' in t,
     '*': lambda t: '*' in t,
     ':': lambda t: ':' in t,
     '/': lambda t: '/' in t,
-    # '(': lambda t: '(' in t,
+    '(': lambda t: '(' in t,
     '{': lambda t: '{' in t,
     '[': lambda t: '[' in t,
-    '=': lambda t: '=' in t,
+    # '=': lambda t: '=' in t,
     '+': lambda t: '+' in t,
     ',': lambda t: ',' in t,
     '\'': lambda t: '\'' in t,
@@ -21,11 +21,11 @@ RULE_TABLE = {
     '?': lambda t: '?' in t,
     '!': lambda t: '!' in t,
     '$': lambda t: '$' in t,
-    # '<': lambda t: '<' in t,
+    '<': lambda t: '<' in t,
     '>': lambda t: '>' in t,
     '@': lambda t: '@' in t,
-    '|': lambda t: '|' in t,
-    '#': lambda t: '#' in t,
+    # '|': lambda t: '|' in t,
+    # '#': lambda t: '#' in t,
 }
 # 根据符号查询数组下标
 RULE_IDX = {}

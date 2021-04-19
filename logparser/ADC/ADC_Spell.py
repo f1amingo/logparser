@@ -3,7 +3,7 @@ Description : This file implements the Spell algorithm for log parsing
 Author      : LogPAI team
 License     : MIT
 """
-import collections
+
 import hashlib
 import os
 import re
@@ -13,13 +13,15 @@ import pandas as pd
 from .log_signature import calc_signature
 
 
+
 class LCSObject:
     """ Class object to store a log group with the same template
     """
 
-    def __init__(self, logTemplate, logIDL):
+    def __init__(self, logTemplate='', logIDL=[]):
         self.logTemplate = logTemplate
         self.logIDL = logIDL
+        self.template_idx = None  # 模板在桶中的序号，从0开始
 
 
 class Node:
@@ -31,6 +33,7 @@ class Node:
         self.token = token
         self.templateNo = templateNo
         self.childD = dict()
+        self.template_count = 0  # 这棵树中的模板数量
 
 
 class LogParser:
@@ -106,30 +109,28 @@ class LogParser:
         return retLogClust
 
     def LCSMatch(self, logClustL, seq):
-        if seq[0] == 'Verification':
-            a = 1
+        retLogClust = None
+
         maxLen = -1
+        maxlcs = []
         maxClust = None
-        maxIdx = -1
         set_seq = set(seq)
         size_seq = len(seq)
-        for i, logClust in enumerate(logClustL):
+        for logClust in logClustL:
             set_template = set(logClust.logTemplate)
-            # 两个set中相同token的数量超过一半
             if len(set_seq & set_template) < 0.5 * size_seq:
                 continue
             lcs = self.LCS(seq, logClust.logTemplate)
-            # 选lcs最长的，如果lcs相同就选模板长度最小的
             if len(lcs) > maxLen or (len(lcs) == maxLen and len(logClust.logTemplate) < len(maxClust.logTemplate)):
                 maxLen = len(lcs)
+                maxlcs = lcs
                 maxClust = logClust
-                maxIdx = i
 
         # LCS should be large then tau * len(itself)
-        if float(maxLen) < self.tau * size_seq:
-            return len(logClustL), None
-        else:
-            return maxIdx, maxClust
+        if float(maxLen) >= self.tau * size_seq:
+            retLogClust = maxClust
+
+        return retLogClust
 
     def getTemplate(self, lcs, seq):
         retVal = []
@@ -155,6 +156,10 @@ class LogParser:
         parentn = rootn
         seq = newCluster.logTemplate
         seq = [w for w in seq if w != '<*>']
+        # 设置序号，可能已经有序号了
+        if newCluster.template_idx is None:
+            newCluster.template_idx = rootn.template_count
+            rootn.template_count += 1  # 这棵树的模板总数增加
 
         for i in range(len(seq)):
             tokenInSeq = seq[i]
@@ -191,15 +196,13 @@ class LogParser:
         self.df_log['EventId'] = event_id_list
         self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_structured.csv'), index=False)
 
-    # logClustL: List[LCSObject]
-    # 一个LCSObject就是一类模板
     def outputResult(self, logClustL):
         if not os.path.exists(self.savePath):
             os.makedirs(self.savePath)
 
         templates = [0] * self.df_log.shape[0]
         ids = [0] * self.df_log.shape[0]
-        df_event = []  # 解析的模板结果
+        df_event = []
 
         for logclust in logClustL:
             template_str = ' '.join(logclust.logTemplate)
@@ -218,58 +221,82 @@ class LogParser:
         self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_structured.csv'), index=False)
         df_event.to_csv(os.path.join(self.savePath, self.logname + '_templates.csv'), index=False)
 
+    def printTree(self, node, dep):
+        pStr = ''
+        for i in range(dep):
+            pStr += '\t'
+
+        if node.token == '':
+            pStr += 'Root'
+        else:
+            pStr += node.token
+            if node.logClust is not None:
+                pStr += '-->' + ' '.join(node.logClust.logTemplate)
+        print(pStr + ' (' + str(node.templateNo) + ')')
+
+        for child in node.childD:
+            self.printTree(node.childD[child], dep + 1)
+
     def parse(self, logname):
-        start_time = datetime.now()
+        starttime = datetime.now()
         print('Parsing file: ' + os.path.join(self.path, logname))
         self.logname = logname
         self.load_data()
-        # 每个bin保存一个logCluster列表
-        sig_bin = collections.defaultdict(list)
-        # 保存根节点
-        root_bin = {}
-        # 保存解析的EventId
-        event_id_list = []
-        event_id_occurrence = collections.defaultdict(int)
-        event_templates = {}
+        # rootNode = Node()
+        # logCluL = []
+        sig_bins = {}  # 元素为元组(rootNode, logCluL)
+        event_id_list = []  # 保存解析的EventId
 
         for idx, line in self.df_log.iterrows():
-            log_content = line['Content']
-            log_sig = calc_signature(log_content)  # 计算签名
-            logCluL = sig_bin[log_sig]
-            if log_sig not in root_bin:
-                root_bin[log_sig] = Node()
-            rootNode = root_bin[log_sig]
+            # 计算签名
+            # log_sig = 0
+            log_sig = calc_signature(line['Content'])
+            if log_sig not in sig_bins:
+                sig_bins[log_sig] = (Node(), [])
+            rootNode, logCluL = sig_bins[log_sig]
+            cur_templated_idx = None
 
             logID = line['LineId']
             logmessageL = list(filter(lambda x: x != '', re.split(r'[\s=:,]', self.preprocess(line['Content']))))
+            constLogMessL = [w for w in logmessageL if w != '<*>']
 
-            match_idx, matchCluster = self.LCSMatch(logCluL, logmessageL)
-            parsed_event_id = log_sig * 100 + match_idx
+            # Find an existing matched log cluster
+            matchCluster = self.PrefixTreeMatch(rootNode, constLogMessL, 0)
+
             if matchCluster is None:
-                newCluster = LCSObject(logTemplate=logmessageL, logIDL=[logID])
-                logCluL.append(newCluster)
-                # 保存模板
-                event_templates[parsed_event_id] = logmessageL
-            else:
-                cur_lcs = self.LCS(logmessageL, matchCluster.logTemplate)
-                matchCluster.logTemplate = self.getTemplate(cur_lcs, matchCluster.logTemplate)
-                matchCluster.logIDL.append(logID)
-                # 保存模板
-                event_templates[parsed_event_id] = matchCluster.logTemplate
+                matchCluster = self.SimpleLoopMatch(logCluL, constLogMessL)
 
-            event_id_list.append(parsed_event_id)
-            event_id_occurrence[parsed_event_id] += 1
+                if matchCluster is None:
+                    matchCluster = self.LCSMatch(logCluL, logmessageL)
+
+                    if matchCluster is None:
+                        newCluster = LCSObject(logTemplate=logmessageL, logIDL=[logID])
+                        logCluL.append(newCluster)
+                        self.addSeqToPrefixTree(rootNode, newCluster)
+
+                        cur_templated_idx = newCluster.template_idx
+                    else:
+                        newTemplate = self.getTemplate(self.LCS(logmessageL, matchCluster.logTemplate),
+                                                       matchCluster.logTemplate)
+                        if ' '.join(newTemplate) != ' '.join(matchCluster.logTemplate):
+                            self.removeSeqFromPrefixTree(rootNode, matchCluster)
+                            matchCluster.logTemplate = newTemplate
+                            self.addSeqToPrefixTree(rootNode, matchCluster)
+            if matchCluster:
+                matchCluster.logIDL.append(logID)
+                cur_templated_idx = matchCluster.template_idx
+
+            # 计算event id
+            assert cur_templated_idx is not None
+            event_id_list.append(log_sig * 100 + cur_templated_idx)
 
             count = idx + 1
             if count % 1000 == 0 or count == len(self.df_log):
                 print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)))
 
+        # self.outputResult(logCluL)
         self.outputEventId(event_id_list)
-        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
-
-        print(len(event_id_occurrence))
-        print(event_id_occurrence)
-        print([' '.join(event_templates[k]) for k in event_templates])
+        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - starttime))
 
     def load_data(self):
         headers, regex = self.generate_logformat_regex(self.logformat)
