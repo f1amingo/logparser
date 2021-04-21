@@ -1,58 +1,97 @@
-from typing import List
+import collections
+import re
 
-# 字符级别规则
-RULE_TABLE = {
-    # '-': lambda t: '-' in t,  # don't use this
+CHAR_LIST = [
+    # '-',
+    # '=',
+    # '/',
+    # '.', Thunderbird
+    # '<', Proxifier
+    '+', '*', '>',
+    ',', ';', ':', '\'', '"',
+    # '#', Thunderbird
+    '?', '!', '$', '@', '|',
+    # '(', Thunderbird Proxifier
+    '{', '[',
+]
+TOKEN_LIST = [
+    # Linux
+    'user=guest'  # E18
+    , 'user=root'  # E19
+    , 'user=test'  # E20
+    , '(reserved)'  # E20
+    , 'hub'  # E110
 
-    '.': lambda t: '.' in t,
-    # '_': lambda t: '_' in t,
-    '*': lambda t: '*' in t,
-    ':': lambda t: ':' in t,
-    '/': lambda t: '/' in t,
-    '(': lambda t: '(' in t,
-    '{': lambda t: '{' in t,
-    '[': lambda t: '[' in t,
-    # '=': lambda t: '=' in t,
-    '+': lambda t: '+' in t,
-    ',': lambda t: ',' in t,
-    '\'': lambda t: '\'' in t,
-    '"': lambda t: '"' in t,
-    ';': lambda t: ';' in t,
-    '?': lambda t: '?' in t,
-    '!': lambda t: '!' in t,
-    '$': lambda t: '$' in t,
-    '<': lambda t: '<' in t,
-    '>': lambda t: '>' in t,
-    '@': lambda t: '@' in t,
-    # '|': lambda t: '|' in t,
-    # '#': lambda t: '#' in t,
-}
-# 根据符号查询数组下标
-RULE_IDX = {}
-for idx, sym in enumerate(RULE_TABLE):
-    RULE_IDX[sym] = idx
-# 位图
-# -1 -2 -3几个索引分别表示 token 数量为1 2 3
-BITMAP = [0] * (len(RULE_TABLE) + 3)
+    # Thunderbird
+    , '(run-parts'
+
+    , "'Active'"  # Mac E258
+    , "Authenticated"  # Mac E163
+    , "Evaluating"  # Mac E164
+
+    , "HealthApp"  # Mac E7
+
+]
+SPECIAL_LIST = [
+    # '^[A-Z]+$',
+    # '\d+',
+    # '\d+(\.\d+)?',
+    '^LOGIN*'  # linux E104
+
+    , '^RoamFail*'  # Mac E168
+    , '^AssocFail*'  # Mac E169
+    , '^DeauthInd*'  # Mac E170
+
+    , '.*android.intent.action.SCREEN_ON'  # HealthApp E43
+]
+
+CHAR_DICT = {k: 0 for k in CHAR_LIST}
+TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
+SPECIAL_DICT = {k: 0 for k in SPECIAL_LIST}
 
 
 def calc_signature(content: str) -> int:
-    def _bitmap_to_number(_bitmap: List):
-        _res = 0
-        for _digit in _bitmap:
-            _digit = 1 if _digit else 0
-            _res = 2 * _res + _digit
-        return _res
+    def dict2Int(dic: dict, base: int = 0) -> int:
+        for v in dic.values():
+            digit = 0 if v == 0 else 1
+            base = 2 * base + digit
+        return base
 
-    this_bitmap = BITMAP.copy()
-    this_token_list = content.split()
-    # 处理token数量
-    if len(this_token_list) <= 3:
-        this_bitmap[-len(this_token_list)] = 1
-    # 处理字符级别特征
-    for token in this_token_list:
-        for idx, rule in enumerate(RULE_IDX):
-            if this_bitmap[idx] == 0:
-                is_match = RULE_TABLE[rule](token)
-                this_bitmap[idx] = int(is_match)
-    return _bitmap_to_number(this_bitmap)
+    # 字符级别
+    char_dict = CHAR_DICT.copy()
+    for ch in content:
+        if ch in char_dict:
+            char_dict[ch] += 1
+    # token级别
+    token_dict = TOKEN_DICT.copy()
+    split_list = content.split()
+    special_dict = SPECIAL_DICT.copy()
+    for token in split_list:
+        if token in TOKEN_DICT:
+            token_dict[token] += 1
+        # 正则表达式特殊规则
+        for regex in SPECIAL_LIST:
+            if re.match(regex, token):
+                special_dict[regex] += 1
+
+    base = dict2Int(char_dict, 0)
+    base = dict2Int(token_dict, base)
+    base = dict2Int(special_dict, base)
+    return base
+
+
+def char_counter(s: str) -> dict:
+    res_dict = collections.defaultdict(int)
+    for c in s:
+        if c in CHAR_DICT:
+            res_dict[c] += 1
+    return res_dict
+
+
+if __name__ == '__main__':
+    str1 = "com.apple.icloud.fmfd.heartbeat: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 439034 seconds.  Ignoring."
+    str2 = "com.apple.ical.sync.x-coredata://DB05755C-483D-44B7-B93B-ED06E57FF420/CalDAVPrincipal/p11: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 59 seconds.  Ignoring."
+    dict1 = char_counter(str1)
+    dict2 = char_counter(str2)
+    print(calc_signature(str1))
+    print(calc_signature(str2))
