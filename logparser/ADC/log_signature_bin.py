@@ -11,6 +11,7 @@ df.drop(['Date', 'Time', 'Pid', 'Level', 'Component'], axis=1, inplace=True, err
 df.drop_duplicates(subset=['EventId'], keep='first', inplace=True)
 
 sig_bins = collections.defaultdict(list)
+token_counter_bins = collections.defaultdict(dict)
 sig_list = []
 eventId_list = []
 content_list = []
@@ -23,6 +24,15 @@ for idx, row in df.iterrows():
     eventId_list.append(row['EventId'])
     content_list.append(row['Content'])
     template_list.append(row['EventTemplate'])
+
+    # 统计桶内token词频
+    split_list = row['Content'].split()
+    this_bin = token_counter_bins[this_signature]
+    for token in split_list:
+        if token in this_bin:
+            this_bin[token] += 1
+        else:
+            this_bin[token] = 1
 
 print(sig_bins)
 print(len(sig_bins))

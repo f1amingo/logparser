@@ -1,0 +1,44 @@
+,LineId,Month,PID,Content,EventId,EventTemplate
+14,15,Jun,21416.0,session closed for user cyrus,E101,session closed for user <*>
+143,144,Jun,,cupsd shutdown succeeded,E37,cupsd shutdown succeeded
+144,145,Jun,,cupsd startup succeeded,E38,cupsd startup succeeded
+145,146,Jun,,restart.,E90,restart.
+166,167,Jun,2318.0,Received SNMP packet(s) from 67.170.148.126,E88,Received SNMP packet(s) from <*>
+539,540,Jun,19272.0,Kerberos authentication failed,E61,Kerberos authentication failed
+1809,1810,Jul,2306.0,notify question section contains no SOA,E75,notify question section contains no SOA
+1908,1909,Jul,,syslogd startup succeeded,E106,syslogd startup succeeded
+1917,1918,Jul,,0MB HIGHMEM available.,E2,<*> HIGHMEM available.
+1918,1919,Jul,,126MB LOWMEM available.,E3,<*> LOWMEM available.
+1919,1920,Jul,,zapping low mappings.,E118,zapping low mappings.
+1920,1921,Jul,,klogd startup succeeded,E65,klogd startup succeeded
+1924,1925,Jul,,irqbalance startup succeeded,E58,irqbalance startup succeeded
+1926,1927,Jul,,DMI 2.3 present.,E42,DMI <*>.<*> present.
+1927,1928,Jul,,ACPI disabled because your bios is from 2000 and too old,E4,ACPI disabled because your bios is from <*> and too old
+1928,1929,Jul,,You can enable it with acpi=force,E117,You can enable it with acpi=force
+1929,1930,Jul,,Built 1 zonelists,E24,Built <*> zonelists
+1931,1932,Jul,,mapped 4G/4G trampoline to ffff3000.,E69,mapped 4G/4G trampoline to <*>.
+1932,1933,Jul,,Initializing CPU#0,E52,Initializing CPU#<*>
+1934,1935,Jul,,portmap startup succeeded,E85,portmap startup succeeded
+1936,1937,Jul,,Detected 731.219 MHz processor.,E40,Detected <*>.<*> MHz processor.
+1937,1938,Jul,1618.0,Version 1.0.6 Starting,E114,Version <*>.<*>.<*> Starting
+1938,1939,Jul,,Using tsc for high-res timesource,E113,Using tsc for high-res timesource
+1939,1940,Jul,,rpc.statd startup succeeded,E93,rpc.statd startup succeeded
+1942,1943,Jul,,Calibrating delay loop... 1445.88 BogoMIPS,E25,Calibrating delay loop... <*>.<*> BogoMIPS
+1943,1944,Jul,,Security Scaffold v1.0.0 initialized,E96,Security Scaffold v<*>.<*>.<*> initialized
+1947,1948,Jul,,Failure registering capabilities with the kernel,E46,Failure registering capabilities with the kernel
+1949,1950,Jul,,Capability LSM initialized,E26,Capability LSM initialized
+1950,1951,Jul,,rpc.idmapd startup succeeded,E92,rpc.idmapd startup succeeded
+1956,1957,Jul,,Intel machine check architecture supported.,E56,Intel machine check architecture supported.
+1957,1958,Jul,,Intel machine check reporting enabled on CPU#0.,E57,Intel machine check reporting enabled on CPU#<*>.
+1959,1960,Jul,,Enabling fast FPU save and restore... done.,E44,Enabling fast FPU save and restore... done.
+1960,1961,Jul,,Enabling unmasked SIMD FPU exception support... done.,E45,Enabling unmasked SIMD FPU exception support... done.
+1963,1964,Jul,,POSIX conformance testing by UNIFIX,E86,POSIX conformance testing by UNIFIX
+1970,1971,Jul,,Linux Plug and Play Support v0.97 (c) Adam Belay,E67,Linux Plug and Play Support v<*>.<*> (c) Adam Belay
+1982,1983,Jul,,kernel.core_uses_pid = 1,E63,kernel.core_uses_pid = <*>
+1983,1984,Jul,1690.0,HCI daemon ver 2.4 started,E48,HCI daemon ver <*>.<*> started
+1984,1985,Jul,,hcid startup succeeded,E49,hcid startup succeeded
+1987,1988,Jul,,sdpd startup succeeded,E94,sdpd startup succeeded
+1988,1989,Jul,1696.0,sdpd v1.5 started,E95,sdpd v<*>.<*> started
+1994,1995,Jul,,Initializing Cryptographic API,E53,Initializing Cryptographic API
+1998,1999,Jul,,Real Time Clock Driver v1.12,E87,Real Time Clock Driver v<*>.<*>
+1999,2000,Jul,,Linux agpgart interface v0.100 (c) Dave Jones,E66,Linux agpgart interface v<*>.<*> (c) Dave Jones

@@ -1,119 +1,119 @@
 signature,content,template
-1114112,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=218.188.2.4,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
-65536,check pass; user unknown,check pass; user unknown
-1114112,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=220-135-151-1.hinet-ip.hinet.net  user=root,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>  user=root
-64,session opened for user cyrus by (uid=0),session opened for user <*> by (uid=<*>)
+2214592512,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=218.188.2.4,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>
+67108864,check pass; user unknown,check pass; user unknown
+2214608896,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=220-135-151-1.hinet-ip.hinet.net  user=root,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>  user=root
+2147483648,session opened for user cyrus by (uid=0),session opened for user <*> by (uid=<*>)
 0,session closed for user cyrus,session closed for user <*>
-20,ALERT exited abnormally with [1],ALERT exited abnormally with [1]
-1081411,connection from 24.54.76.216 (24-54-76-216.bflony.adelphia.net) at Fri Jun 17 07:07:00 2005,connection from <*> (<*>) at <*>:<*>:<*>
-1114112,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=211.46.224.253  user=guest,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>  user=guest
-32771,User unknown timed out after 900 seconds at Sat Jun 18 02:23:10 2005,User unknown timed out after <*> seconds at <*>:<*>:<*> <*>
+65536,ALERT exited abnormally with [1],ALERT exited abnormally with [1]
+33554432,connection from 24.54.76.216 (24-54-76-216.bflony.adelphia.net) at Fri Jun 17 07:07:00 2005,connection from <*> (<*>) at <*>:<*>:<*>
+2214625280,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=211.46.224.253  user=guest,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>  user=guest
+33554432,User unknown timed out after 900 seconds at Sat Jun 18 02:23:10 2005,User unknown timed out after <*> seconds at <*>:<*>:<*> <*>
 0,cupsd shutdown succeeded,cupsd shutdown succeeded
 0,cupsd startup succeeded,cupsd startup succeeded
-1048576,restart.,restart.
-1048647,Received SNMP packet(s) from 67.170.148.126,Received SNMP packet(s) from <*>
-1081411,Authentication failed from 163.27.187.39 (163.27.187.39): Permission denied in replay cache code,Authentication failed from <*> (<*>): Permission denied in replay cache code
+1,restart.,restart.
+0,Received SNMP packet(s) from 67.170.148.126,Received SNMP packet(s) from <*>
+33554432,Authentication failed from 163.27.187.39 (163.27.187.39): Permission denied in replay cache code,Authentication failed from <*> (<*>): Permission denied in replay cache code
 0,Kerberos authentication failed,Kerberos authentication failed
-1081411,Authentication failed from 163.27.187.39 (163.27.187.39): Software caused connection abort,Authentication failed from <*> (<*>): Software caused connection abort
-5275728,*** info [mice.c(1766)]:,*** info [mice.c(<*>)]:
-2129920,imps2: Auto-detected intellimouse PS/2,imps2: Auto-detected intellimouse PS/<*>
-64,session opened for user root by LOGIN(uid=0),session opened for user <*> by LOGIN(uid=<*>)
-4,ROOT LOGIN ON tty2,ROOT LOGIN ON tty2
-2113536,removing device node '/udev/vcsa2',removing device node '/udev/<*>'
-2113536,creating device node '/udev/vcs2',creating device node '/udev/<*>'
-1114112,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=212.0.132.20  user=test,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>  user=test
-98304,authentication failure; logname= uid=0 euid=0 tty=:0 ruser= rhost=,authentication failure; logname= uid=0 euid=0 tty=:0 ruser= rhost=
-16384,Couldn't authenticate user,Couldn't authenticate user
-1179719,"ANONYMOUS FTP LOGIN FROM 84.102.20.2,  (anonymous)","ANONYMOUS FTP LOGIN FROM <*>,  (anonymous)"
-4,notify question section contains no SOA,notify question section contains no SOA
-32840,getpeername (ftpd): Transport endpoint is not connected,getpeername (ftpd): Transport endpoint is not connected
-49152,warning: can't get client address: Connection reset by peer,warning: can't get client address: Connection reset by peer
+33554432,Authentication failed from 163.27.187.39 (163.27.187.39): Software caused connection abort,Authentication failed from <*> (<*>): Software caused connection abort
+570490880,*** info [mice.c(1766)]:,*** info [mice.c(<*>)]:
+33554432,imps2: Auto-detected intellimouse PS/2,imps2: Auto-detected intellimouse PS/<*>
+2147483680,session opened for user root by LOGIN(uid=0),session opened for user <*> by LOGIN(uid=<*>)
+32,ROOT LOGIN ON tty2,ROOT LOGIN ON tty2
+16777216,removing device node '/udev/vcsa2',removing device node '/udev/<*>'
+16777216,creating device node '/udev/vcs2',creating device node '/udev/<*>'
+2214600704,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=212.0.132.20  user=test,authentication failure; logname= uid=0 euid=0 tty=NODEVssh ruser= rhost=<*>  user=test
+2248146944,authentication failure; logname= uid=0 euid=0 tty=:0 ruser= rhost=,authentication failure; logname= uid=0 euid=0 tty=:0 ruser= rhost=
+16777216,Couldn't authenticate user,Couldn't authenticate user
+134217760,"ANONYMOUS FTP LOGIN FROM 84.102.20.2,  (anonymous)","ANONYMOUS FTP LOGIN FROM <*>,  (anonymous)"
+0,notify question section contains no SOA,notify question section contains no SOA
+33554432,getpeername (ftpd): Transport endpoint is not connected,getpeername (ftpd): Transport endpoint is not connected
+50331648,warning: can't get client address: Connection reset by peer,warning: can't get client address: Connection reset by peer
 0,syslogd startup succeeded,syslogd startup succeeded
-3276803,"klogd 1.4.1, log source = /proc/kmsg started.","klogd <*>.<*>.<*>, log source = /proc/kmsg started."
-1082055,Linux version 2.6.5-1.358 (bhcompile@bugs.build.redhat.com) (gcc version 3.3.3 20040412 (Red Hat Linux 3.3.3-7)) #1 Sat May 8 09:04:50 EDT 2004,Linux version <*>.<*>.<*><*>.<*> (bhcompile@bugs.build.redhat.com) (gcc version <*>.<*>.<*> (Red Hat Linux <*>.<*>.<*><*>)) #<*> <*>:<*>:<*> EDT <*>
-32772,BIOS-provided physical RAM map:,BIOS-provided physical RAM map:
-32835,BIOS-e820: 0000000000000000 - 00000000000a0000 (usable),BIOS-e820: <*> - <*> (usable)
-32835,BIOS-e820: 00000000000f0000 - 0000000000100000 (reserved),BIOS-e820: <*> - <*> (reserved)
-1048583,0MB HIGHMEM available.,<*> HIGHMEM available.
-1048583,126MB LOWMEM available.,<*> LOWMEM available.
-1048576,zapping low mappings.,zapping low mappings.
+2281701377,"klogd 1.4.1, log source = /proc/kmsg started.","klogd <*>.<*>.<*>, log source = /proc/kmsg started."
+34078720,Linux version 2.6.5-1.358 (bhcompile@bugs.build.redhat.com) (gcc version 3.3.3 20040412 (Red Hat Linux 3.3.3-7)) #1 Sat May 8 09:04:50 EDT 2004,Linux version <*>.<*>.<*><*>.<*> (bhcompile@bugs.build.redhat.com) (gcc version <*>.<*>.<*> (Red Hat Linux <*>.<*>.<*><*>)) #<*> <*>:<*>:<*> EDT <*>
+33554432,BIOS-provided physical RAM map:,BIOS-provided physical RAM map:
+33554432,BIOS-e820: 0000000000000000 - 00000000000a0000 (usable),BIOS-e820: <*> - <*> (usable)
+33558528,BIOS-e820: 00000000000f0000 - 0000000000100000 (reserved),BIOS-e820: <*> - <*> (reserved)
+1,0MB HIGHMEM available.,<*> HIGHMEM available.
+1,126MB LOWMEM available.,<*> LOWMEM available.
+1,zapping low mappings.,zapping low mappings.
 0,klogd startup succeeded,klogd startup succeeded
-32771,On node 0 totalpages: 32430,On node <*> totalpages: <*>
-163847,"DMA zone: 4096 pages, LIFO batch:1","DMA zone: <*> pages, LIFO batch:<*>"
-163847,"Normal zone: 28334 pages, LIFO batch:6","Normal zone: <*> pages, LIFO batch:<*>"
+33554432,On node 0 totalpages: 32430,On node <*> totalpages: <*>
+167772160,"DMA zone: 4096 pages, LIFO batch:1","DMA zone: <*> pages, LIFO batch:<*>"
+167772160,"Normal zone: 28334 pages, LIFO batch:6","Normal zone: <*> pages, LIFO batch:<*>"
 0,irqbalance startup succeeded,irqbalance startup succeeded
-163847,"HighMem zone: 0 pages, LIFO batch:1","HighMem zone: <*> pages, LIFO batch:<*>"
-1048583,DMI 2.3 present.,DMI <*>.<*> present.
-15,ACPI disabled because your bios is from 2000 and too old,ACPI disabled because your bios is from <*> and too old
-0,You can enable it with acpi=force,You can enable it with acpi=force
-3,Built 1 zonelists,Built <*> zonelists
-2129920,Kernel command line: ro root=LABEL=/ rhgb quiet,Kernel command line: ro root=LABEL=/ rhgb quiet
-3145731,mapped 4G/4G trampoline to ffff3000.,mapped 4G/4G trampoline to <*>.
-128,Initializing CPU#0,Initializing CPU#<*>
-131079,"CPU 0 irqstacks, hard=02345000 soft=02344000","CPU <*> irqstacks, hard=<*> soft=<*>"
+167772160,"HighMem zone: 0 pages, LIFO batch:1","HighMem zone: <*> pages, LIFO batch:<*>"
+1,DMI 2.3 present.,DMI <*>.<*> present.
+0,ACPI disabled because your bios is from 2000 and too old,ACPI disabled because your bios is from <*> and too old
+2147483648,You can enable it with acpi=force,You can enable it with acpi=force
+0,Built 1 zonelists,Built <*> zonelists
+2181038080,Kernel command line: ro root=LABEL=/ rhgb quiet,Kernel command line: ro root=LABEL=/ rhgb quiet
+1,mapped 4G/4G trampoline to ffff3000.,mapped 4G/4G trampoline to <*>.
+0,Initializing CPU#0,Initializing CPU#<*>
+2281701376,"CPU 0 irqstacks, hard=02345000 soft=02344000","CPU <*> irqstacks, hard=<*> soft=<*>"
 0,portmap startup succeeded,portmap startup succeeded
-32839,PID hash table entries: 512 (order 9: 4096 bytes),PID hash table entries: 512 (order <*>: <*> bytes)
-1048579,Detected 731.219 MHz processor.,Detected <*>.<*> MHz processor.
-1048579,Version 1.0.6 Starting,Version <*>.<*>.<*> Starting
+33554432,PID hash table entries: 512 (order 9: 4096 bytes),PID hash table entries: 512 (order <*>: <*> bytes)
+1,Detected 731.219 MHz processor.,Detected <*>.<*> MHz processor.
+0,Version 1.0.6 Starting,Version <*>.<*>.<*> Starting
 0,Using tsc for high-res timesource,Using tsc for high-res timesource
-1048576,rpc.statd startup succeeded,rpc.statd startup succeeded
-8421379,Console: colour VGA+ 80x25,Console: colour VGA+ <*>
-2261059,"Memory: 125312k/129720k available (1540k kernel code, 3860k reserved, 599k data, 144k init, 0k highmem)","Memory: <*> available (<*> kernel code, <*> reserved, <*> data, <*> init, <*> highmem)"
-1048579,Calibrating delay loop... 1445.88 BogoMIPS,Calibrating delay loop... <*>.<*> BogoMIPS
-1048576,Security Scaffold v1.0.0 initialized,Security Scaffold v<*>.<*>.<*> initialized
-1081344,SELinux:  Initializing.,SELinux:  Initializing.
-32768,SELinux:  Starting in permissive mode,SELinux:  Starting in permissive mode
-1179656,"There is already a security framework initialized, register_security failed.","There is already a security framework initialized, register_security failed."
+0,rpc.statd startup succeeded,rpc.statd startup succeeded
+1107296256,Console: colour VGA+ 80x25,Console: colour VGA+ <*>
+167772160,"Memory: 125312k/129720k available (1540k kernel code, 3860k reserved, 599k data, 144k init, 0k highmem)","Memory: <*> available (<*> kernel code, <*> reserved, <*> data, <*> init, <*> highmem)"
+1,Calibrating delay loop... 1445.88 BogoMIPS,Calibrating delay loop... <*>.<*> BogoMIPS
+0,Security Scaffold v1.0.0 initialized,Security Scaffold v<*>.<*>.<*> initialized
+33554433,SELinux:  Initializing.,SELinux:  Initializing.
+33554432,SELinux:  Starting in permissive mode,SELinux:  Starting in permissive mode
+134217729,"There is already a security framework initialized, register_security failed.","There is already a security framework initialized, register_security failed."
 0,Failure registering capabilities with the kernel,Failure registering capabilities with the kernel
-32768,selinux_register_security:  Registering secondary module capability,selinux_register_security:  Registering secondary module capability
-4,Capability LSM initialized,Capability LSM initialized
-1048576,rpc.idmapd startup succeeded,rpc.idmapd startup succeeded
-163907,"Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)","Dentry cache hash table entries: <*> (order: <*>, <*> bytes)"
-163907,"Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)","Inode-cache hash table entries: <*> (order: <*>, <*> bytes)"
-163907,"Mount-cache hash table entries: 512 (order: 0, 4096 bytes)","Mount-cache hash table entries: <*> (order: <*>, <*> bytes)"
-163847,"CPU: L1 I cache: 16K, L1 D cache: 16K","CPU: L1 I cache: <*>, L1 D cache: <*>"
-32771,CPU: L2 cache: 256K,CPU: L2 cache: <*>
-1048576,Intel machine check architecture supported.,Intel machine check architecture supported.
-1048704,Intel machine check reporting enabled on CPU#0.,Intel machine check reporting enabled on CPU#<*>.
-32839,CPU: Intel Pentium III (Coppermine) stepping 06,CPU: Intel Pentium III (Coppermine) stepping <*>
-1048580,Enabling fast FPU save and restore... done.,Enabling fast FPU save and restore... done.
-1048580,Enabling unmasked SIMD FPU exception support... done.,Enabling unmasked SIMD FPU exception support... done.
-1064960,Checking 'hlt' instruction... OK.,Checking 'hlt' instruction... OK.
-32768,Initializing random number generator:  succeeded,Initializing random number generator:  succeeded
-4,POSIX conformance testing by UNIFIX,POSIX conformance testing by UNIFIX
-32771,NET: Registered protocol family 16,NET: Registered protocol family <*>
-1212423,"PCI: PCI BIOS revision 2.10 entry at 0xfc0ce, last bus=1","PCI: PCI BIOS revision <*>.<*> entry at <*>, last bus=<*>"
-32771,PCI: Using configuration type 1,PCI: Using configuration type <*>
-1081408,mtrr: v2.0 (20020519),mtrr: v<*>.<*> (<*>)
-32771,ACPI: Subsystem revision 20040326,ACPI: Subsystem revision <*>
-1081344,ACPI: Interpreter disabled.,ACPI: Interpreter disabled.
-1048640,Linux Plug and Play Support v0.97 (c) Adam Belay,Linux Plug and Play Support v<*>.<*> (c) Adam Belay
-32768,Starting pcmcia:  succeeded,Starting pcmcia:  succeeded
-32768,usbcore: registered new driver usbfs,usbcore: registered new driver usbfs
-32768,usbcore: registered new driver hub,usbcore: registered new driver hub
-32772,ACPI: ACPI tables contain no PCI IRQ routing entries,ACPI: ACPI tables contain no PCI IRQ routing entries
-32772,PCI: Invalid ACPI-PCI IRQ routing table,PCI: Invalid ACPI-PCI IRQ routing table
-32772,PCI: Probing PCI hardware,PCI: Probing PCI hardware
-32839,PCI: Probing PCI hardware (bus 00),PCI: Probing PCI hardware (bus <*>)
-1081347,Transparent bridge - 0000:00:1e.0,Transparent bridge - <*>
-3178519,PCI: Using IRQ router PIIX/ICH [8086/2410] at 0000:00:1f.0,PCI: Using IRQ router PIIX/ICH [<*>/<*>] at <*>
-1081415,apm: BIOS version 1.2 Flags 0x03 (Driver version 1.16ac),apm: BIOS version <*>.<*> Flags <*> (Driver version <*>)
-32832,audit: initializing netlink socket (disabled),audit: initializing netlink socket (disabled)
-1048579,kernel.core_uses_pid = 1,kernel.core_uses_pid = <*>
-1048583,HCI daemon ver 2.4 started,HCI daemon ver <*>.<*> started
+33554432,selinux_register_security:  Registering secondary module capability,selinux_register_security:  Registering secondary module capability
+0,Capability LSM initialized,Capability LSM initialized
+0,rpc.idmapd startup succeeded,rpc.idmapd startup succeeded
+167772160,"Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)","Dentry cache hash table entries: <*> (order: <*>, <*> bytes)"
+167772160,"Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)","Inode-cache hash table entries: <*> (order: <*>, <*> bytes)"
+167772160,"Mount-cache hash table entries: 512 (order: 0, 4096 bytes)","Mount-cache hash table entries: <*> (order: <*>, <*> bytes)"
+167772160,"CPU: L1 I cache: 16K, L1 D cache: 16K","CPU: L1 I cache: <*>, L1 D cache: <*>"
+33554432,CPU: L2 cache: 256K,CPU: L2 cache: <*>
+1,Intel machine check architecture supported.,Intel machine check architecture supported.
+1,Intel machine check reporting enabled on CPU#0.,Intel machine check reporting enabled on CPU#<*>.
+33554432,CPU: Intel Pentium III (Coppermine) stepping 06,CPU: Intel Pentium III (Coppermine) stepping <*>
+1,Enabling fast FPU save and restore... done.,Enabling fast FPU save and restore... done.
+1,Enabling unmasked SIMD FPU exception support... done.,Enabling unmasked SIMD FPU exception support... done.
+16777217,Checking 'hlt' instruction... OK.,Checking 'hlt' instruction... OK.
+33554432,Initializing random number generator:  succeeded,Initializing random number generator:  succeeded
+0,POSIX conformance testing by UNIFIX,POSIX conformance testing by UNIFIX
+33554432,NET: Registered protocol family 16,NET: Registered protocol family <*>
+2315255808,"PCI: PCI BIOS revision 2.10 entry at 0xfc0ce, last bus=1","PCI: PCI BIOS revision <*>.<*> entry at <*>, last bus=<*>"
+33554432,PCI: Using configuration type 1,PCI: Using configuration type <*>
+33554432,mtrr: v2.0 (20020519),mtrr: v<*>.<*> (<*>)
+33554432,ACPI: Subsystem revision 20040326,ACPI: Subsystem revision <*>
+33554433,ACPI: Interpreter disabled.,ACPI: Interpreter disabled.
+0,Linux Plug and Play Support v0.97 (c) Adam Belay,Linux Plug and Play Support v<*>.<*> (c) Adam Belay
+33554432,Starting pcmcia:  succeeded,Starting pcmcia:  succeeded
+33554432,usbcore: registered new driver usbfs,usbcore: registered new driver usbfs
+33556480,usbcore: registered new driver hub,usbcore: registered new driver hub
+33554432,ACPI: ACPI tables contain no PCI IRQ routing entries,ACPI: ACPI tables contain no PCI IRQ routing entries
+33554432,PCI: Invalid ACPI-PCI IRQ routing table,PCI: Invalid ACPI-PCI IRQ routing table
+33554432,PCI: Probing PCI hardware,PCI: Probing PCI hardware
+33554432,PCI: Probing PCI hardware (bus 00),PCI: Probing PCI hardware (bus <*>)
+33554432,Transparent bridge - 0000:00:1e.0,Transparent bridge - <*>
+33619968,PCI: Using IRQ router PIIX/ICH [8086/2410] at 0000:00:1f.0,PCI: Using IRQ router PIIX/ICH [<*>/<*>] at <*>
+33554432,apm: BIOS version 1.2 Flags 0x03 (Driver version 1.16ac),apm: BIOS version <*>.<*> Flags <*> (Driver version <*>)
+33554432,audit: initializing netlink socket (disabled),audit: initializing netlink socket (disabled)
+2147483648,kernel.core_uses_pid = 1,kernel.core_uses_pid = <*>
+0,HCI daemon ver 2.4 started,HCI daemon ver <*>.<*> started
 0,hcid startup succeeded,hcid startup succeeded
-1081408,audit(1122475266.4294965305:0): initialized,audit(<*>.<*>:<*>): initialized
-32768,Setting network parameters:  succeeded,Setting network parameters:  succeeded
+33554432,audit(1122475266.4294965305:0): initialized,audit(<*>.<*>:<*>): initialized
+33554432,Setting network parameters:  succeeded,Setting network parameters:  succeeded
 0,sdpd startup succeeded,sdpd startup succeeded
-1048576,sdpd v1.5 started,sdpd v<*>.<*> started
-131075,"Total HugeTLB memory allocated, 0","Total HugeTLB memory allocated, <*>"
-32768,Bringing up loopback interface:  succeeded,Bringing up loopback interface:  succeeded
-1081344,VFS: Disk quotas dquot_6.5.1,VFS: Disk quotas dquot_<*>.<*>.<*>
-163907,"Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)","Dquot-cache hash table entries: <*> (order <*>, <*> bytes)"
-32768,SELinux:  Registering netfilter hooks,SELinux:  Registering netfilter hooks
-4,Initializing Cryptographic API,Initializing Cryptographic API
-1081351,pci_hotplug: PCI Hot Plug PCI Core version: 0.5,pci_hotplug: PCI Hot Plug PCI Core version: <*>.<*>
-1081344,isapnp: Scanning for PnP cards...,isapnp: Scanning for PnP cards...
-32768,isapnp: No Plug & Play device found,isapnp: No Plug & Play device found
-1048576,Real Time Clock Driver v1.12,Real Time Clock Driver v<*>.<*>
-1048640,Linux agpgart interface v0.100 (c) Dave Jones,Linux agpgart interface v<*>.<*> (c) Dave Jones
+0,sdpd v1.5 started,sdpd v<*>.<*> started
+134217728,"Total HugeTLB memory allocated, 0","Total HugeTLB memory allocated, <*>"
+33554432,Bringing up loopback interface:  succeeded,Bringing up loopback interface:  succeeded
+33554432,VFS: Disk quotas dquot_6.5.1,VFS: Disk quotas dquot_<*>.<*>.<*>
+167772160,"Dquot-cache hash table entries: 1024 (order 0, 4096 bytes)","Dquot-cache hash table entries: <*> (order <*>, <*> bytes)"
+33554432,SELinux:  Registering netfilter hooks,SELinux:  Registering netfilter hooks
+0,Initializing Cryptographic API,Initializing Cryptographic API
+33554432,pci_hotplug: PCI Hot Plug PCI Core version: 0.5,pci_hotplug: PCI Hot Plug PCI Core version: <*>.<*>
+33554433,isapnp: Scanning for PnP cards...,isapnp: Scanning for PnP cards...
+33554432,isapnp: No Plug & Play device found,isapnp: No Plug & Play device found
+0,Real Time Clock Driver v1.12,Real Time Clock Driver v<*>.<*>
+0,Linux agpgart interface v0.100 (c) Dave Jones,Linux agpgart interface v<*>.<*> (c) Dave Jones

@@ -1,4 +1,4 @@
 import re
 
-result = re.match('^[A-Z]+$', 'ABC', flags=0)
+result = re.match('\d$', '123', flags=0)
 print(result)

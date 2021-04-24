@@ -3,7 +3,7 @@ import re
 
 CHAR_LIST = [
     # '-',
-    # '=',
+    '=',
     # '/',
     # '.', Thunderbird
     # '<', Proxifier
@@ -43,6 +43,8 @@ SPECIAL_LIST = [
     , '^DeauthInd*'  # Mac E170
 
     , '.*android.intent.action.SCREEN_ON'  # HealthApp E43
+
+    # , '.*\.$'  # 以点结尾
 ]
 
 CHAR_DICT = {k: 0 for k in CHAR_LIST}

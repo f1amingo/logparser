@@ -1,2 +1,2 @@
-com.apple.ical.sync.x-coredata://DB05755C-483D-44B7-B93B-ED06E57FF420/CalDAVPrincipal/p11: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 59 seconds.  Ignoring.
-com.apple.icloud.fmfd.heartbeat: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 439034 seconds.  Ignoring.
+E45,Enabling unmasked SIMD FPU exception support... done.
+E67,Linux Plug and Play Support v<*>.<*> (c) Adam Belay
