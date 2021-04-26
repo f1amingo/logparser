@@ -273,6 +273,8 @@ class LogParser:
         for idx, line in self.df_log.iterrows():
             log_content = line['Content']
             log_id = line['LineId']
+            if log_id == 298:
+                a = 1
             # 预处理，token化
             log_token_list = self.preprocess(log_content).strip().split()
             # 计算签名

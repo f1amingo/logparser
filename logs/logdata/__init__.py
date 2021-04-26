@@ -35,3 +35,9 @@ def path_raw(dataset: DATASET):
     parent_dir = os.path.dirname(os.path.dirname(__file__))
     file_name = '%s_2k.log' % dataset.value
     return os.path.join(parent_dir, dataset.value, file_name)
+
+
+def path_template(dataset: DATASET):
+    parent_dir = os.path.dirname(os.path.dirname(__file__))
+    file_name = '%s_2k.log_templates.csv' % dataset.value
+    return os.path.join(parent_dir, dataset.value, file_name)
