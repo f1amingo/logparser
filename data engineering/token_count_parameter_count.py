@@ -33,6 +33,6 @@ if __name__ == '__main__':
             eventId = row['EventId']
             # split_list = template.split()
             split_list = re.split('[ =|,]', template)
-            if len(split_list) == 1:
-                if template.find('<*>') == -1:
+            if len(split_list) == 3:
+                if template.find('<*>') != -1:
                     print('%s %s: %s' % (dataset.value, eventId, template))
