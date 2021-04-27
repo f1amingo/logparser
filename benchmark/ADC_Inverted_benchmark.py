@@ -103,13 +103,13 @@ benchmark_settings = {
         'depth': 4
     },
 
-    'Proxifier': {
-        'log_file': 'Proxifier/Proxifier_2k.log',
-        'log_format': '\[<Time>\] <Program> - <Content>',
-        'regex': [r'<\d+\ssec', r'([\w-]+\.)+[\w-]+(:\d+)?', r'\d{2}:\d{2}(:\d{2})*', r'[KGTM]B'],
-        'st': 0.6,
-        'depth': 3
-    },
+    # 'Proxifier': {
+    #     'log_file': 'Proxifier/Proxifier_2k.log',
+    #     'log_format': '\[<Time>\] <Program> - <Content>',
+    #     'regex': [r'<\d+\ssec', r'([\w-]+\.)+[\w-]+(:\d+)?', r'\d{2}:\d{2}(:\d{2})*', r'[KGTM]B'],
+    #     'st': 0.6,
+    #     'depth': 3
+    # },
 
     'OpenSSH': {
         'log_file': 'OpenSSH/OpenSSH_2k.log',
@@ -119,13 +119,13 @@ benchmark_settings = {
         'depth': 5
     },
 
-    'OpenStack': {
-        'log_file': 'OpenStack/OpenStack_2k.log',
-        'log_format': '<Logrecord> <Date> <Time> <Pid> <Level> <Component> \[<ADDR>\] <Content>',
-        'regex': [r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
-        'st': 0.5,
-        'depth': 5
-    },
+    # 'OpenStack': {
+    #     'log_file': 'OpenStack/OpenStack_2k.log',
+    #     'log_format': '<Logrecord> <Date> <Time> <Pid> <Level> <Component> \[<ADDR>\] <Content>',
+    #     'regex': [r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
+    #     'st': 0.5,
+    #     'depth': 5
+    # },
 
     'Mac': {
         'log_file': 'Mac/Mac_2k.log',

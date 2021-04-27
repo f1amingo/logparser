@@ -1,2 +1,2 @@
-E45,Enabling unmasked SIMD FPU exception support... done.
-E67,Linux Plug and Play Support v<*>.<*> (c) Adam Belay
+E6,BLOCK* NameSystem.addStoredBlock: blockMap updated: <*>:<*> is added to blk_<*> size <*>
+E8,BLOCK* NameSystem.delete: blk_<*> is added to invalidSet of <*>:<*>

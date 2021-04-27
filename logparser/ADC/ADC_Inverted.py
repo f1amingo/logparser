@@ -60,10 +60,13 @@ class LogParser:
                     if score_list[i] > max_score:
                         max_score = score_list[i]
                         max_idx = i
-        if len(split_list) <= 2 and max_score >= 1:
-            return max_idx
-        if len(split_list) > 2 and max_score >= 2:
-            return max_idx
+        if max_idx is not None and len(split_list) == len(log_cluster.template_list[max_idx].split()):
+            if len(split_list) <= 2 and max_score >= 1:
+                return max_idx
+            if len(split_list) < 6 and max_score >= 2:
+                return max_idx
+            if len(split_list) >= 6 and max_score >= 3:
+                return max_idx
         return None
 
     # 把模板添加到簇内
