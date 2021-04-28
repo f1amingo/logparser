@@ -19,9 +19,9 @@ class DATASET(Enum):
     Android = 'Andriod'  # todo rename
     Apache = 'Apache'
     HealthApp = 'HealthApp'
-    Proxifier = 'Proxifier'
+    # Proxifier = 'Proxifier'
     OpenSSH = 'OpenSSH'
-    OpenStack = 'OpenStack'
+    # OpenStack = 'OpenStack'
     Mac = 'Mac'
 
 
