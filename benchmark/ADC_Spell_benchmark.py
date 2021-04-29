@@ -1,138 +1,123 @@
-import pandas as pd
-import os
 from logparser import evaluator
-from logparser.ADC import ADC_Drain
+import os
+import pandas as pd
+
+from logparser.ADC import ADC_Spell
 
 input_dir = '../logs/'  # The input directory of log file
-output_dir = 'ADC_Drain_result/'  # The output directory of parsing results
+output_dir = 'ADC_Spell_result/'  # The output directory of parsing results
 
 benchmark_settings = {
     'HDFS': {
         'log_file': 'HDFS/HDFS_2k.log',
         'log_format': '<Date> <Time> <Pid> <Level> <Component>: <Content>',
         'regex': [r'blk_-?\d+', r'(\d+\.){3}\d+(:\d+)?'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.7
     },
 
     'Hadoop': {
         'log_file': 'Hadoop/Hadoop_2k.log',
         'log_format': '<Date> <Time> <Level> \[<Process>\] <Component>: <Content>',
         'regex': [r'(\d+\.){3}\d+'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.7
     },
 
     'Spark': {
         'log_file': 'Spark/Spark_2k.log',
         'log_format': '<Date> <Time> <Level> <Component>: <Content>',
         'regex': [r'(\d+\.){3}\d+', r'\b[KGTM]?B\b', r'([\w-]+\.){2,}[\w-]+'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.55
     },
 
     'Zookeeper': {
         'log_file': 'Zookeeper/Zookeeper_2k.log',
         'log_format': '<Date> <Time> - <Level>  \[<Node>:<Component>@<Id>\] - <Content>',
         'regex': [r'(/|)(\d+\.){3}\d+(:\d+)?'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.7
     },
 
     'BGL': {
         'log_file': 'BGL/BGL_2k.log',
         'log_format': '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>',
         'regex': [r'core\.\d+'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.75
     },
 
     'HPC': {
         'log_file': 'HPC/HPC_2k.log',
         'log_format': '<LogId> <Node> <Component> <State> <Time> <Flag> <Content>',
         'regex': [r'=\d+'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.65
     },
 
     'Thunderbird': {
         'log_file': 'Thunderbird/Thunderbird_2k.log',
         'log_format': '<Label> <Timestamp> <Date> <User> <Month> <Day> <Time> <Location> <Component>(\[<PID>\])?: <Content>',
         'regex': [r'(\d+\.){3}\d+'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.5
     },
 
     'Windows': {
         'log_file': 'Windows/Windows_2k.log',
         'log_format': '<Date> <Time>, <Level>                  <Component>    <Content>',
         'regex': [r'0x.*?\s'],
-        'st': 0.7,
-        'depth': 5
+        'tau': 0.7
     },
 
     'Linux': {
         'log_file': 'Linux/Linux_2k.log',
         'log_format': '<Month> <Date> <Time> <Level> <Component>(\[<PID>\])?: <Content>',
         'regex': [r'(\d+\.){3}\d+', r'\d{2}:\d{2}:\d{2}'],
-        'st': 0.39,
-        'depth': 6
+        'tau': 0.55
     },
 
     'Andriod': {
         'log_file': 'Andriod/Andriod_2k.log',
         'log_format': '<Date> <Time>  <Pid>  <Tid> <Level> <Component>: <Content>',
         'regex': [r'(/[\w-]+)+', r'([\w-]+\.){2,}[\w-]+', r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'],
-        'st': 0.2,
-        'depth': 6
+        'tau': 0.95
     },
 
     'HealthApp': {
         'log_file': 'HealthApp/HealthApp_2k.log',
         'log_format': '<Time>\|<Component>\|<Pid>\|<Content>',
         'regex': [],
-        'st': 0.2,
-        'depth': 4
+        'tau': 0.5
     },
 
     'Apache': {
         'log_file': 'Apache/Apache_2k.log',
         'log_format': '\[<Time>\] \[<Level>\] <Content>',
         'regex': [r'(\d+\.){3}\d+'],
-        'st': 0.5,
-        'depth': 4
+        'tau': 0.6
     },
 
     'Proxifier': {
         'log_file': 'Proxifier/Proxifier_2k.log',
         'log_format': '\[<Time>\] <Program> - <Content>',
         'regex': [r'<\d+\ssec', r'([\w-]+\.)+[\w-]+(:\d+)?', r'\d{2}:\d{2}(:\d{2})*', r'[KGTM]B'],
-        'st': 0.6,
-        'depth': 3
+        'tau': 0.85
     },
 
     'OpenSSH': {
         'log_file': 'OpenSSH/OpenSSH_2k.log',
         'log_format': '<Date> <Day> <Time> <Component> sshd\[<Pid>\]: <Content>',
         'regex': [r'(\d+\.){3}\d+', r'([\w-]+\.){2,}[\w-]+'],
-        'st': 0.6,
-        'depth': 5
+        'tau': 0.8
     },
 
     'OpenStack': {
         'log_file': 'OpenStack/OpenStack_2k.log',
         'log_format': '<Logrecord> <Date> <Time> <Pid> <Level> <Component> \[<ADDR>\] <Content>',
         'regex': [r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
-        'st': 0.5,
-        'depth': 5
+        'tau': 0.9
     },
 
     'Mac': {
         'log_file': 'Mac/Mac_2k.log',
         'log_format': '<Month>  <Date> <Time> <User> <Component>\[<PID>\]( \(<Address>\))?: <Content>',
         'regex': [r'([\w-]+\.){2,}[\w-]+'],
-        'st': 0.7,
-        'depth': 6
+        'tau': 0.6
     },
 }
 
@@ -143,9 +128,8 @@ if __name__ == '__main__':
         indir = os.path.join(input_dir, os.path.dirname(setting['log_file']))
         log_file = os.path.basename(setting['log_file'])
 
-        parser = ADC_Drain.LogParser(log_format=setting['log_format'], indir=indir, outdir=output_dir,
-                                     rex=setting['regex'],
-                                     depth=setting['depth'], st=setting['st'])
+        parser = ADC_Spell.LogParser(log_format=setting['log_format'], indir=indir,
+                                     outdir=output_dir, rex=setting['regex'], tau=setting['tau'])
         parser.parse(log_file)
 
         F1_measure, accuracy = evaluator.evaluate(
@@ -158,6 +142,8 @@ if __name__ == '__main__':
     df_result = pd.DataFrame(bechmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
     df_result.set_index('Dataset', inplace=True)
     print(df_result)
+
     accuracy_list = list(map(str, list(df_result['Accuracy'])))
     print('\t'.join(accuracy_list))
-    df_result.T.to_csv('ADC_Drain_bechmark_result.csv')
+
+    df_result.T.to_csv('ADC_Spell_bechmark_result.csv')

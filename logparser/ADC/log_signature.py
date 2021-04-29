@@ -1,50 +1,41 @@
 import collections
 import re
 
+# 只要不会在变量中出现就可以
+# '.' '-' 不可以
 CHAR_LIST = [
-    # '-',
-    '=',
+    # '=',
     # '/',
-    # '.', Thunderbird
-    # '<', Proxifier
-    '+', '*', '>',
-    ',', ';', ':', '\'', '"',
+    # '<',
+    # '+', '*', '>',
+    # ',', ';', ':', '\'', '"',
     # '#', Thunderbird
-    '?', '!', '$', '@', '|',
+    # '?', '!', '$', '@', '|',
     # '(', Thunderbird Proxifier
-    '{', '[',
+    # '{', '[',
 ]
 TOKEN_LIST = [
-    # Linux
-    'user=guest'  # E18
-    , 'user=root'  # E19
-    , 'user=test'  # E20
-    , '(reserved)'  # E20
-    , 'hub'  # E110
-
-    # Thunderbird
-    , '(run-parts'
-
-    , "'Active'"  # Mac E258
-    , "Authenticated"  # Mac E163
-    , "Evaluating"  # Mac E164
-
-    , "HealthApp"  # Mac E7
-
+    # 'user=guest'  # Linux E18
+    # , 'user=root'  # E19
+    # , 'user=test'  # E20
+    # , '(reserved)'  # E20
+    # , 'hub'  # E110
+    # , '(run-parts'  # Thunderbird
+    # , "'Active'"  # Mac E258
+    # , "Authenticated"  # Mac E163
+    # , "Evaluating"  # Mac E164
+    # , "HealthApp"  # Mac E7
 ]
 SPECIAL_LIST = [
     # '^[A-Z]+$',
     # '\d+',
     # '\d+(\.\d+)?',
-    '^LOGIN*'  # linux E104
+    # '.*\.$',  # 以点结尾
 
-    , '^RoamFail*'  # Mac E168
-    , '^AssocFail*'  # Mac E169
-    , '^DeauthInd*'  # Mac E170
-
-    , '.*android.intent.action.SCREEN_ON'  # HealthApp E43
-
-    # , '.*\.$'  # 以点结尾
+    # '^LOGIN*'  # linux E104
+    # , '^RoamFail*'  # Mac E168
+    # , '^AssocFail*'  # Mac E169
+    # , '^DeauthInd*'  # Mac E170
 ]
 
 CHAR_DICT = {k: 0 for k in CHAR_LIST}
@@ -79,6 +70,12 @@ def calc_signature(content: str) -> int:
     base = dict2Int(char_dict, 0)
     base = dict2Int(token_dict, base)
     base = dict2Int(special_dict, base)
+
+    # 长度信息
+    base *= 10
+    # 长度小于5，否则可能是变长变量
+    if len(split_list) < 100:
+        base += len(split_list)
     return base
 
 

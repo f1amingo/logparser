@@ -17,7 +17,7 @@ class DATASET(Enum):
     Windows = 'Windows'
     Linux = 'Linux'
     Android = 'Andriod'  # todo rename
-    Apache = 'Apache'
+    # Apache = 'Apache'
     HealthApp = 'HealthApp'
     # Proxifier = 'Proxifier'
     OpenSSH = 'OpenSSH'

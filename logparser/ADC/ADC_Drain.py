@@ -273,8 +273,6 @@ class LogParser:
         for idx, line in self.df_log.iterrows():
             log_content = line['Content']
             log_id = line['LineId']
-            if log_id == 298:
-                a = 1
             # 预处理，token化
             log_token_list = self.preprocess(log_content).strip().split()
             # 计算签名
@@ -308,7 +306,7 @@ class LogParser:
 
                 cluster_template_id = matched_cluster.template_id
 
-            event_id_list.append(log_sig * 100 + cluster_template_id)
+            event_id_list.append(log_sig * 1000 + cluster_template_id)
 
             count = idx + 1
             if count % 1000 == 0 or count == len(self.df_log):
