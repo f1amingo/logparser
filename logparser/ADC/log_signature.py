@@ -74,7 +74,7 @@ def calc_signature(content: str) -> int:
     # 长度信息
     base *= 10
     # 长度小于5，否则可能是变长变量
-    if len(split_list) < 100:
+    if len(split_list) < 6:
         base += len(split_list)
     return base
 

@@ -5,47 +5,52 @@
 
 变长变量位置一定是靠后的
 变长变量是一种普遍的现象，但影响大就只有几个
+只管Thunderbird、Android就好，最小长度为7
+
+HDFS 4条
+Zookeeper 10条
+HPC 7条
+Thunderbird 23条
+Andriod 77条
+特殊情况：E10 tag="View Lock"
+Mac 7条
 
 HDFS
-{'E4': 3})
+defaultdict(<class 'int'>, {'E4': 3})
 Hadoop
-{})
+defaultdict(<class 'int'>, {})
 Spark
-{'E2': 112, 'E3': 37})
+defaultdict(<class 'int'>, {})
 Zookeeper
-{'E44': 3})
+defaultdict(<class 'int'>, {'E44': 9})
 BGL
-{'E73': 5, 'E109': 1, 'E65': 1})
+defaultdict(<class 'int'>, {})
 HPC
-{'E43': 4, 'E20': 2})
+defaultdict(<class 'int'>, {'E43': 3, 'E20': 2})
 Thunderbird
-{'E111': 10, 'E4': 1, 'E9': 2, 'E146': 34, 'E147': 1})
+defaultdict(<class 'int'>, {'E146': 19, 'E111': 2})
 Windows
-{'E13': 6})
+defaultdict(<class 'int'>, {})
 Linux
-{'E29': 909, 'E112': 1, 'E68': 1})
+defaultdict(<class 'int'>, {})
 Andriod
-{'E10': 1, 'E131': 4, 'E108': 1, 'E41': 25})
-Apache
-{})
+defaultdict(<class 'int'>, {'E108': 25, 'E41': 24, 'E10': 25})
 HealthApp
-{})
-Proxifier
-{'E8': 947})
+defaultdict(<class 'int'>, {})
 OpenSSH
-{'E14': 2})
-OpenStack
-{'E25': 931, 'E26': 64, 'E24': 22})
+defaultdict(<class 'int'>, {})
 Mac
-{'E48': 14, 'E130': 7, 'E331': 12, 'E210': 4, 'E204': 6, 'E154': 3, 'E265': 1, 'E107': 1, 'E30': 1, 'E88': 1})
+defaultdict(<class 'int'>, {'E265': 2, 'E210': 3})
 """
 
 from logs.logdata import *
 import pandas as pd
 import collections
+import shlex
 
 template_list = []
 content_list = []
+message_length = []
 eventId_list = []
 dataset_list = []
 for dataset in DATASET:
@@ -57,8 +62,9 @@ for dataset in DATASET:
         eventId = row['EventId']
         content = row['Content']
         template = row['EventTemplate']
-        template_split = template.split()
+        # template_split = template.split()
         content_split = content.split()
+        # content_split = shlex.split(content)
         if eventId in len_dict:
             len_d = len_dict[eventId]
             if len_d is None or len_d != len(content_split):
@@ -68,6 +74,7 @@ for dataset in DATASET:
                 content_list.append(content_split)
                 eventId_list.append(eventId)
                 dataset_list.append(dataset.value)
+                message_length.append(len(content_split))
         else:
             len_dict[eventId] = len(content_split)
 
@@ -81,7 +88,8 @@ for dataset in DATASET:
 
 out_df = pd.DataFrame()
 out_df['dataset'] = dataset_list
+out_df['length'] = message_length
 out_df['eventId'] = eventId_list
-out_df['template'] = template_list
 out_df['content'] = content_list
-out_df.to_csv('variable.csv')
+out_df['template'] = template_list
+out_df.to_csv('variable.csv', index=False)
