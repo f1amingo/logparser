@@ -5,7 +5,7 @@ from benchmark.Spell_benchmark import benchmark_settings
 
 # The input directory of log file
 output_dir = 'ADC_Spell_result/'  # The output directory of parsing results
-one_setting = benchmark_settings['HDFS']
+one_setting = benchmark_settings['OpenSSH']
 log_file = os.path.basename(one_setting['log_file'])
 input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 

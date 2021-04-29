@@ -92,4 +92,4 @@ out_df['length'] = message_length
 out_df['eventId'] = eventId_list
 out_df['content'] = content_list
 out_df['template'] = template_list
-out_df.to_csv('variable.csv', index=False)
+out_df.to_csv('length.csv', index=False)

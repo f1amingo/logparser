@@ -3,17 +3,19 @@ import re
 
 # 只要不会在变量中出现就可以
 # '.' '-' 不可以
+# '(' '#' Thunderbird
+# '/' Mac 200行
+# ':' Android E41
+# '*' Mac E53
+
 CHAR_LIST = [
-    # '=',
-    # '/',
-    # '<',
-    # '+', '*', '>',
-    # ',', ';', ':', '\'', '"',
-    # '#', Thunderbird
-    # '?', '!', '$', '@', '|',
-    # '(', Thunderbird Proxifier
-    # '{', '[',
+    '=',
+    ';',
+    '"',
 ]
+CHAR_COUNT_LIST = {
+    # '='
+}
 TOKEN_LIST = [
     # 'user=guest'  # Linux E18
     # , 'user=root'  # E19
@@ -71,11 +73,16 @@ def calc_signature(content: str) -> int:
     base = dict2Int(token_dict, base)
     base = dict2Int(special_dict, base)
 
+    # 字符计数信息
+    # for ch in CHAR_COUNT_LIST:
+    #     base = base * 10 + char_dict[ch]
+
     # 长度信息
-    base *= 10
+    # base *= 10
     # 长度小于5，否则可能是变长变量
-    if len(split_list) < 6:
-        base += len(split_list)
+    # if len(split_list) < 6:
+    # if len(split_list) < 1000:  # 使用完全长度信息
+    #     base += len(split_list)
     return base
 
 
