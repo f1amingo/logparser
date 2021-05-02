@@ -78,11 +78,8 @@ def calc_signature(content: str) -> int:
     #     base = base * 10 + char_dict[ch]
 
     # 长度信息
-    # base *= 10
-    # 长度小于5，否则可能是变长变量
-    # if len(split_list) < 6:
-    # if len(split_list) < 1000:  # 使用完全长度信息
-    #     base += len(split_list)
+    base = base * 100 + len(split_list)
+    # if len(split_list) < 6: # 长度小于5，否则可能是变长变量
     return base
 
 
