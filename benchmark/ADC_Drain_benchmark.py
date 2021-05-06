@@ -3,6 +3,7 @@ import os
 from logparser import evaluator
 from logparser.ADC import ADC_Drain
 import logparser.ADC.ADC_Drain_No_Length as ADC_Drain
+import logparser.ADC.ADC_Drain_Sim as ADC_Drain
 
 input_dir = '../logs/'  # The input directory of log file
 output_dir = 'ADC_Drain_result/'  # The output directory of parsing results

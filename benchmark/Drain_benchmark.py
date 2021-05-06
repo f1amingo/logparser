@@ -84,6 +84,7 @@ benchmark_settings = {
         'log_file': 'Andriod/Andriod_2k.log',
         'log_format': '<Date> <Time>  <Pid>  <Tid> <Level> <Component>: <Content>',
         'regex': [r'(/[\w-]+)+', r'([\w-]+\.){2,}[\w-]+', r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'],
+        # 'regex': [r'"(.*)"', r'[0-9]+'],
         'st': 0.2,
         'depth': 6
     },
