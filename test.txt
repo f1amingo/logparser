@@ -1,2 +1,2 @@
-"ready=true,policy=3,wakefulness=1,wksummary=0x23,uasummary=0x1,bootcompleted=true,boostinprogress=false,waitmodeenable=false,mode=false,manual=38,auto=-1,adj=0.0userId=0"
-"ready=true,policy=<*>,wakefulness=<*>,wksummary=<*>,uasummary=<*>,bootcompleted=true,boostinprogress=false,waitmodeenable=false,mode=false,manual=<*>,auto=<*>,adj=<*>.0userId=<*>"
+['BLOCK*', 'NameSystem.delete:', '<*>', 'is', 'added', 'to', 'invalidSet', 'of', '<*>']
+['BLOCK*', 'ask', '<*>', 'to', 'replicate', '<*>', 'to', 'datanode(s)', '<*>']

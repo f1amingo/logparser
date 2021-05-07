@@ -1,6 +1,6 @@
 import os
 from logparser import evaluator
-from benchmark.Drain_benchmark import benchmark_settings
+from benchmark.ADC_Drain_benchmark import benchmark_settings
 import logparser.ADC.ADC_Drain_Sim as ADC_Drain
 
 # The input directory of log file

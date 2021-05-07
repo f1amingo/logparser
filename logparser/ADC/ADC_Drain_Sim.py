@@ -13,11 +13,13 @@ def log_sim(log1: str, log2: str) -> (float, float):
     split_list1, split_list2 = re.split(DELIMITERS, log1), re.split(DELIMITERS, log2)
     m, n = len(split_list1), len(split_list2)
 
+    if m != n:
+        return 0, 0
     # 利用首token信息
     if split_list1[0] != split_list2[0]:
         return 0, 0
-    if m > 1 and n > 1 and split_list1[1] != split_list2[1]:
-        return 0, 0
+    # if m > 1 and n > 1 and split_list1[1] != split_list2[1]:
+    #     return 0, 0
 
     if m > n:
         # 让log1更短
@@ -26,6 +28,10 @@ def log_sim(log1: str, log2: str) -> (float, float):
     i, j = 0, 0
     forward, backward = 0, 0
     while i < m:
+        if split_list1[i] == '<*>' or split_list1[i] == '':
+            i += 1
+            j += 1
+            continue
         forward += 1 if split_list1[i] == split_list2[j] else 0
         i += 1
         j += 1
@@ -76,7 +82,7 @@ class LogParser:
                 max_idx = i
                 max_foo, max_bar = forward, backward
 
-        if max_foo > 0.2 or max_bar > 0.2:
+        if max_foo > self.st:
             return max_idx, template_list[max_idx]
         return -1, None
 
@@ -100,12 +106,12 @@ class LogParser:
             log_content = line['Content']
             log_id = line['LineId']
             log_content = self.preprocess(log_content).strip()
-            # log_token_list = self.preprocess(log_content).strip().split()
             log_token_list = log_content.split()
             log_sig = calc_signature(log_content)
             template_list = bin_dict[log_sig]
-            template_idx, template = self.fastMatch(template_list, log_token_list)
+            template_idx, template_token_list = self.fastMatch(template_list, log_token_list)
             if template_idx == -1:
+                # 没有匹配上
                 template_idx = len(template_list)
                 template_list.append(log_token_list)
             else:

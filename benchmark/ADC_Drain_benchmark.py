@@ -1,8 +1,6 @@
 import pandas as pd
 import os
 from logparser import evaluator
-from logparser.ADC import ADC_Drain
-import logparser.ADC.ADC_Drain_No_Length as ADC_Drain
 import logparser.ADC.ADC_Drain_Sim as ADC_Drain
 
 input_dir = '../logs/'  # The input directory of log file
@@ -45,7 +43,7 @@ benchmark_settings = {
         'log_file': 'BGL/BGL_2k.log',
         'log_format': '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>',
         'regex': [r'core\.\d+'],
-        'st': 0.5,
+        'st': 0.3,
         'depth': 4
     },
 
@@ -85,7 +83,7 @@ benchmark_settings = {
         'log_file': 'Andriod/Andriod_2k.log',
         'log_format': '<Date> <Time>  <Pid>  <Tid> <Level> <Component>: <Content>',
         'regex': [r'(/[\w-]+)+', r'([\w-]+\.){2,}[\w-]+', r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'],
-        'st': 0.2,
+        'st': 0.3,
         'depth': 6
     },
 
