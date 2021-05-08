@@ -42,8 +42,8 @@ benchmark_settings = {
     'BGL': {
         'log_file': 'BGL/BGL_2k.log',
         'log_format': '<Label> <Timestamp> <Date> <Node> <Time> <NodeRepeat> <Type> <Component> <Level> <Content>',
-        'regex': [r'core\.\d+'],
-        'st': 0.3,
+        'regex': [r'\d+'],
+        'st': 0.4,
         'depth': 4
     },
 
@@ -82,7 +82,8 @@ benchmark_settings = {
     'Andriod': {
         'log_file': 'Andriod/Andriod_2k.log',
         'log_format': '<Date> <Time>  <Pid>  <Tid> <Level> <Component>: <Content>',
-        'regex': [r'(/[\w-]+)+', r'([\w-]+\.){2,}[\w-]+', r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'],
+        # 'regex': [r'(/[\w-]+)+', r'([\w-]+\.){2,}[\w-]+', r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'],
+        'regex': [r'".*"'],
         'st': 0.3,
         'depth': 6
     },

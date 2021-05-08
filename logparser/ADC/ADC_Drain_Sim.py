@@ -4,39 +4,23 @@ import re
 import pandas as pd
 from datetime import datetime
 from typing import List
-from .log_signature import calc_signature
+from .log_signature import calc_signature, calc_signature_list
 
-DELIMITERS = '[ =|,:]'
+DELIMITERS = '[ =,]'
 
 
-def log_sim(log1: str, log2: str) -> (float, float):
-    split_list1, split_list2 = re.split(DELIMITERS, log1), re.split(DELIMITERS, log2)
-    m, n = len(split_list1), len(split_list2)
-
+def log_sim(token_list1: list, token_list2: list) -> (float, float):
+    m, n = len(token_list1), len(token_list2)
     if m != n:
         return 0, 0
     # 利用首token信息
-    if split_list1[0] != split_list2[0]:
+    if token_list1[0] != token_list2[0]:
         return 0, 0
-    # if m > 1 and n > 1 and split_list1[1] != split_list2[1]:
-    #     return 0, 0
-
-    if m > n:
-        # 让log1更短
-        split_list1, split_list2 = split_list2, split_list1
-        m, n = n, m
-    i, j = 0, 0
-    forward, backward = 0, 0
-    while i < m:
-        if split_list1[i] == '<*>' or split_list1[i] == '':
-            i += 1
-            j += 1
-            continue
-        forward += 1 if split_list1[i] == split_list2[j] else 0
-        i += 1
-        j += 1
-        backward += 1 if split_list1[-i] == split_list2[-j] else 0
-    return forward / m, backward / m
+    count = 0
+    for i in range(n):
+        if token_list1[i] == token_list2[i]:
+            count += 1
+    return count / m, 0
 
 
 # 一个叶子节点就是一个LogCluster
@@ -77,7 +61,7 @@ class LogParser:
         max_foo, max_bar = 0, 0
 
         for i, template in enumerate(template_list):
-            forward, backward = log_sim(' '.join(template), ' '.join(seq))
+            forward, backward = log_sim(template, seq)
             if forward + backward > max_foo + max_bar:
                 max_idx = i
                 max_foo, max_bar = forward, backward
@@ -106,8 +90,9 @@ class LogParser:
             log_content = line['Content']
             log_id = line['LineId']
             log_content = self.preprocess(log_content).strip()
-            log_token_list = log_content.split()
-            log_sig = calc_signature(log_content)
+            log_token_list = list(filter(lambda x: x != '' and x != ' ', re.split('([ =,:])', log_content)))
+            # log_token_list = re.split('([( +)=,:])', log_content)
+            log_sig = calc_signature_list(log_token_list)
             template_list = bin_dict[log_sig]
             template_idx, template_token_list = self.fastMatch(template_list, log_token_list)
             if template_idx == -1:

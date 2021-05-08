@@ -17,6 +17,7 @@ CHAR_COUNT_LIST = {
     # '='
 }
 TOKEN_LIST = [
+    'true',
     # 'user=guest'  # Linux E18
     # , 'user=root'  # E19
     # , 'user=test'  # E20
@@ -29,6 +30,8 @@ TOKEN_LIST = [
     # , "HealthApp"  # Mac E7
 ]
 SPECIAL_LIST = [
+    # '.*:true$',
+
     # '^[A-Z]+$',
     # '\d+',
     # '\d+(\.\d+)?',
@@ -45,13 +48,37 @@ TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
 SPECIAL_DICT = {k: 0 for k in SPECIAL_LIST}
 
 
-def calc_signature(content: str) -> int:
-    def dict2Int(dic: dict, base: int = 0) -> int:
-        for v in dic.values():
-            digit = 0 if v == 0 else 1
-            base = 2 * base + digit
-        return base
+def dict2Int(dic: dict, base: int = 0) -> int:
+    for v in dic.values():
+        digit = 0 if v == 0 else 1
+        base = 2 * base + digit
+    return base
 
+
+def calc_signature_list(token_list: list) -> int:
+    char_dict = CHAR_DICT.copy()  # 字符级别
+    token_dict = TOKEN_DICT.copy()  # token级别
+    special_dict = SPECIAL_DICT.copy()  # 正则
+
+    for token in token_list:
+        for ch in token:
+            if ch in char_dict:
+                char_dict[ch] += 1
+        if token in TOKEN_DICT:
+            token_dict[token] += 1
+        for regex in SPECIAL_LIST:
+            if re.match(regex, token):
+                special_dict[regex] += 1
+
+    base = dict2Int(char_dict, 0)
+    base = dict2Int(token_dict, base)
+    base = dict2Int(special_dict, base)
+    # 长度信息
+    base = base * 100 + len(token_list)
+    return base
+
+
+def calc_signature(content: str) -> int:
     # 字符级别
     char_dict = CHAR_DICT.copy()
     for ch in content:

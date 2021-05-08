@@ -1,6 +1,5 @@
 
 from typing import List
-import config
 
 import pandas as pd
 from collections import defaultdict
