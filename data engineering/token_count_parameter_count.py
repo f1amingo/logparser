@@ -6,10 +6,10 @@
 长度为1并且含有变量：
 BGL E65: fpr29=<*> 1次
 HPC E2: ambient=<*> 200+次
-Andriod E29: cancelNotification,index:<*> 23次
-Andriod E32: cancelNotificationLocked:<*>|<*>|<*>|null|<*> 2次
-Andriod E103: ready=true,policy=<*>,wakefulness=<*>,wksummary=<*>,uasummary=<*>,... 199次
-Andriod E111: removeNotification:<*>|<*>|<*>|null|<*> 2次
+Android E29: cancelNotification,index:<*> 23次
+Android E32: cancelNotificationLocked:<*>|<*>|<*>|null|<*> 2次
+Android E103: ready=true,policy=<*>,wakefulness=<*>,wksummary=<*>,uasummary=<*>,... 199次
+Android E111: removeNotification:<*>|<*>|<*>|null|<*> 2次
 Mac E249: IOHibernatePollerOpen(<*>) 2次
 Mac E255: kern_open_file_for_direct_io(<*>) 1次
 
@@ -17,7 +17,7 @@ Mac E255: kern_open_file_for_direct_io(<*>) 1次
 """
 import re
 import pandas as pd
-from logs.logdata import *
+from logparser.utils.logdata import *
 
 if __name__ == '__main__':
     for dataset in DATASET:

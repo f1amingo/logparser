@@ -19,7 +19,7 @@ Mac：
 import collections
 
 import pandas as pd
-from logs.logdata import *
+from logparser.utils.logdata import *
 
 
 # 得到双引号内的内容

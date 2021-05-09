@@ -1,7 +1,7 @@
 # 在签名为0的桶内，测试倒排索引可行性
 import collections
 import pandas as pd
-from logs.logdata import *
+from logparser.utils.logdata import *
 
 zero_index = ['E101', 'E37', 'E38', 'E90', 'E88', 'E61', 'E75', 'E106', 'E2', 'E3', 'E118', 'E65', 'E58', 'E42',
               'E4', 'E117', 'E24', 'E69', 'E52', 'E85', 'E40', 'E114', 'E113', 'E93', 'E25', 'E96', 'E46', 'E26', 'E92',

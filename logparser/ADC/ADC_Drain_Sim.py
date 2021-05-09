@@ -6,8 +6,6 @@ from datetime import datetime
 from typing import List
 from .log_signature import calc_signature, calc_signature_list
 
-DELIMITERS = '[ =,]'
-
 
 def log_sim(token_list1: list, token_list2: list) -> (float, float):
     m, n = len(token_list1), len(token_list2)
@@ -90,8 +88,8 @@ class LogParser:
             log_content = line['Content']
             log_id = line['LineId']
             log_content = self.preprocess(log_content).strip()
-            log_token_list = list(filter(lambda x: x != '' and x != ' ', re.split('([ =,:])', log_content)))
-            # log_token_list = re.split('([( +)=,:])', log_content)
+            # log_token_list = list(filter(lambda x: x != '' and x != ' ', re.split('([ =,:])', log_content)))
+            log_token_list = re.split('([( +)=,:])', log_content)
             log_sig = calc_signature_list(log_token_list)
             template_list = bin_dict[log_sig]
             template_idx, template_token_list = self.fastMatch(template_list, log_token_list)
@@ -121,6 +119,8 @@ class LogParser:
     def preprocess(self, line):
         for currentRex in self.rex:
             line = re.sub(currentRex, '<*>', line)
+        # 替换连续空格
+        line = re.sub('\s+', ' ', line)
         return line
 
     def log_to_dataframe(self, log_file, regex, headers, logformat):

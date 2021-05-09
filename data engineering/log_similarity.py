@@ -6,12 +6,10 @@
 4. 针对模板包含问题，效果如何
 """
 
-import collections
 import re
 
 import pandas as pd
-from logparser.ADC.log_signature import calc_signature
-from logs.logdata import *
+from logparser.utils.logdata import *
 
 DELIMITERS = '[ =|,:]'
 

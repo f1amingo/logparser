@@ -3,9 +3,7 @@
 """
 
 import pandas as pd
-import numpy as np
-from logs.logdata import *
-import collections
+from logparser.utils.logdata import *
 
 sign = '='
 if __name__ == '__main__':

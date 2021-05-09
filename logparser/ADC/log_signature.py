@@ -18,6 +18,8 @@ CHAR_COUNT_LIST = {
 }
 TOKEN_LIST = [
     'true',
+    'SPP.',
+    '\'Active\''
     # 'user=guest'  # Linux E18
     # , 'user=root'  # E19
     # , 'user=test'  # E20

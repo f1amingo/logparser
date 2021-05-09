@@ -11,7 +11,7 @@ HDFS 4条
 Zookeeper 10条
 HPC 7条
 Thunderbird 23条
-Andriod 77条
+Android 77条
 特殊情况：E10 tag="View Lock"
 Mac 7条
 
@@ -33,7 +33,7 @@ Windows
 defaultdict(<class 'int'>, {})
 Linux
 defaultdict(<class 'int'>, {})
-Andriod
+Android
 defaultdict(<class 'int'>, {'E108': 25, 'E41': 24, 'E10': 25})
 HealthApp
 defaultdict(<class 'int'>, {})
@@ -43,10 +43,9 @@ Mac
 defaultdict(<class 'int'>, {'E265': 2, 'E210': 3})
 """
 
-from logs.logdata import *
+from logparser.utils.logdata import *
 import pandas as pd
 import collections
-import shlex
 
 template_list = []
 content_list = []

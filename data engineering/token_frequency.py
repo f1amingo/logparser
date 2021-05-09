@@ -1,6 +1,6 @@
 import pandas as pd
 import collections
-from logs.logdata import *
+from logparser.utils.logdata import *
 import seaborn as sns
 import matplotlib.pyplot as plt
 

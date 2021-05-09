@@ -1,7 +1,7 @@
-from logs.logdata import *
+from logparser.utils.dataset import *
 import pandas as pd
 
-df = pd.read_csv(path_template(DATASET.HDFS))
+df = pd.read_csv(log_path_template(DATASET.HDFS))
 result = []
 for idx, row in df.iterrows():
     template = row['EventTemplate']

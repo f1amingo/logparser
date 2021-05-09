@@ -83,8 +83,8 @@ benchmark_settings = {
         'regex': [r'(\d+\.){3}\d+', r'\d{2}:\d{2}:\d{2}']
     },
 
-    'Andriod': {
-        'log_file': 'Andriod/Andriod_2k.log',
+    'Android': {
+        'log_file': 'Android/Android_2k.log',
         'log_format': '<Date> <Time>  <Pid>  <Tid> <Level> <Component>: <Content>',
         'CT': 0.25,
         'lowerBound': 0.3,

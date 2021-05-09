@@ -4,7 +4,7 @@ from benchmark.Drain_benchmark import benchmark_settings
 from logparser import Drain
 
 output_dir = 'Drain_result/'  # The output directory of parsing results
-one_setting = benchmark_settings['Andriod']
+one_setting = benchmark_settings['Android']
 log_file = os.path.basename(one_setting['log_file'])
 input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 

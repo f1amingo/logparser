@@ -22,8 +22,7 @@ Surface(name=com.tencent.qt.qtl/com.tencent.video.player.activity.PlayerActivity
 """
 
 import pandas as pd
-import numpy as np
-from logs.logdata import *
+from logparser.utils.logdata import *
 import collections
 from logparser.ADC.log_signature import calc_signature
 

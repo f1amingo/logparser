@@ -1,116 +1,132 @@
+import collections
 import re
-import os
-import hashlib
-import pandas as pd
-from datetime import datetime
-from collections import defaultdict
+from typing import List
+from logparser.utils.dataset import *
+from .log_signature import calc_signature_list
 
 
-class Event:
-    def __init__(self, logidx, Eventstr=""):
-        self.id = hashlib.md5(Eventstr.encode('utf-8')).hexdigest()[0:8]
-        self.logs = [logidx]
-        self.Eventstr = Eventstr
-        self.EventToken = Eventstr.split()
-        self.merged = False
-
-    def refresh_id(self):
-        self.id = hashlib.md5(self.Eventstr.encode('utf-8')).hexdigest()[0:8]
+class LogCluster:
+    # LogCluster keeps a list of template with the same signature
+    def __init__(self):
+        self.template_list = []
 
 
 class LogParser:
+    def __init__(self, **kwargs):
+        self.dataset = kwargs['dataset']
+        self.log_format = LOG_FORMAT[self.dataset]
+        self.in_path = log_path_raw(self.dataset)
+        if 'out_path' in kwargs:
+            self.out_path = kwargs['out_path']
+        else:
+            # default out path
+            self.out_path = os.path.join('ADC_result', self.dataset.value + '_structured.csv')
 
-    def __init__(self, indir, outdir, log_format, minEventCount=2, merge_percent=1,
-                 rex=None, keep_para=True):
-        """
-            indir: the input directory of log file
-            outdir: the output directory of parsing results
-            log_format: prior knowledge about the log format
-            minEventCount: the minimum number of events in a bin
-            merge_percent: the percentage of different tokens
-            rex: regular expressions used in preprocessing (step1)
-            keep_para:
-        """
-        self.path = indir
-        self.savePath = outdir
-        self.logformat = log_format
-        self.minEventCount = minEventCount
-        self.merge_percent = merge_percent
-        if rex is None:
-            rex = []
-        self.rex = rex
-        self.keep_para = keep_para
+        self.rex = kwargs['rex']
+        self.st = kwargs['st']
+        self.pre = kwargs['pre']
+        self.keep_para = kwargs.get('keep_para', False)
 
+        self.log_name = None
         self.df_log = None
-        self.logname = None  # the log file name under $indir
-        self.merged_events = []
-        self.bins = defaultdict(dict)
+        self.log_cluster_dict = None
 
-    def parse(self, logname):
-        """
-            parse the $logname file under $indir
-        """
-        start_time = datetime.now()
-        print('Parsing file: ' + os.path.join(self.path, logname))
-        self.logname = logname
+    def parse(self):
         self.load_data()
-        self.tokenize()
-        # self.dump_content()
-        self.dump()
-        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
+        self.log_cluster_dict = collections.defaultdict(LogCluster)
+        eventId_list = []
 
-    def tokenize(self):
-        # tokenization
-        # self.df_log['tokens'] = self.df_log['Content'].map(str.split)
-        pass
+        for idx, line in self.df_log.iterrows():
+            log_content = self.preprocess(line['Content'])
+            log_token_list = self.split(log_content)
+            log_sig = self.calc_signature(log_token_list)
+            log_cluster = self.log_cluster_dict[log_sig]
+            template_idx, template_token_list = self.search(log_cluster, log_token_list)
+            if template_idx == -1:
+                template_idx = self.add_template(log_cluster, log_token_list)
+            else:
+                updated_template = self.new_template_from(log_token_list, template_token_list)
+                self.update_template(log_cluster, updated_template, template_idx)
+            this_eventId = log_sig * 1000 + template_idx
+            eventId_list.append(this_eventId)
 
-    def dump_content(self):
-        if not os.path.isdir(self.savePath):
-            os.makedirs(self.savePath)
-        # 丢弃这几列
-        # for _header in ['Date', 'Time', 'Pid', 'Level', 'Component']:
-        #     self.df_log.drop(_header, axis=1, inplace=True)
-        self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_content.csv'), index=False)
+        self.dump_result(eventId_list)
+        return self.out_path
 
-    def dump(self):
-        if not os.path.isdir(self.savePath):
-            os.makedirs(self.savePath)
+    def preprocess(self, log_content: str) -> str:
+        for currentRex in self.rex:
+            log_content = re.sub(currentRex, '<*>', log_content)
+        # 替换连续空格
+        line = re.sub('\s+', ' ', log_content)
+        return line
 
-        templateL = [0] * self.df_log.shape[0]
-        idL = [0] * self.df_log.shape[0]
-        df_events = []
+    def split(self, log_content: str) -> List[str]:
+        return re.split('([ =,:()\[\]])', log_content)
 
-        for event in self.merged_events:
-            for logidx in event.logs:
-                templateL[logidx] = event.Eventstr
-                idL[logidx] = event.id
-            df_events.append([event.id, event.Eventstr, len(event.logs)])
+    def calc_signature(self, token_list: List[str]) -> int:
+        return calc_signature_list(token_list)
 
-        df_event = pd.DataFrame(df_events, columns=['EventId', 'EventTemplate', 'Occurrences'])
+    def search(self, log_cluster: LogCluster, token_list: List[str]) -> (int, List[str]):
+        def log_sim(token_list1: list, token_list2: list) -> (float, float):
+            m, n = len(token_list1), len(token_list2)
+            if m != n:
+                return 0, 0
+            # 利用前缀信息
+            for i in range(min(self.pre, n)):
+                if token_list1[i] != token_list2[i]:
+                    return 0, 0
+            count = self.pre
+            for i in range(self.pre, n):
+                if token_list1[i] == '<*>' or token_list1[i] == token_list2[i]:
+                    count += 1
+            return count / m, 0
 
-        self.df_log['EventId'] = idL
-        self.df_log['EventTemplate'] = templateL
-        # self.df_log.drop("Content_", axis=1, inplace=True)
-        if self.keep_para:
-            self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1)
-        self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_structured.csv'), index=False)
+        max_score = 0
+        max_idx = -1
+        for i, template in enumerate(log_cluster.template_list):
+            score, _ = log_sim(template, token_list)
+            if score > max_score:
+                max_idx = i
+                max_score = score
 
-        occ_dict = dict(self.df_log['EventTemplate'].value_counts())
-        df_event = pd.DataFrame()
-        df_event['EventTemplate'] = self.df_log['EventTemplate'].unique()
-        df_event['EventId'] = df_event['EventTemplate'].map(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[0:8])
-        df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
-        df_event.to_csv(os.path.join(self.savePath, self.logname + '_templates.csv'), index=False,
-                        columns=["EventId", "EventTemplate", "Occurrences"])
+        if max_score > self.st:
+            return max_idx, log_cluster.template_list[max_idx]
+        return -1, None
+
+    def add_template(self, log_cluster: LogCluster, token_list: List[str]) -> int:
+        log_cluster.template_list.append(token_list)
+        return len(log_cluster.template_list) - 1
+
+    def new_template_from(self, log_token_list: List[str], template_token_list: List[str]) -> List[str]:
+        assert len(log_token_list) == len(template_token_list)
+        new_token_list = []
+        for t1, t2 in zip(log_token_list, template_token_list):
+            if t1 == t2:
+                new_token_list.append(t1)
+            else:
+                new_token_list.append('<*>')
+        return new_token_list
+
+    def update_template(self, log_cluster: LogCluster, token_list: List[str], idx: int):
+        log_cluster.template_list[idx] = token_list
+
+    def dump_result(self, eventId_list):
+        out_dir = os.path.dirname(self.out_path)
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        self.df_log['EventId'] = eventId_list
+        self.df_log.to_csv(self.out_path, index=False)
 
     def load_data(self):
-        def generate_logformat_regex(logformat):
+        def generate_log_format_regex(log_format):
+            """ Function to generate regular expression to split log messages
+            """
             headers = []
-            splitters = re.split(r'(<[^<>]+>)', logformat)
+            splitters = re.split(r'(<[^<>]+>)', log_format)
             regex = ''
             for k in range(len(splitters)):
                 if k % 2 == 0:
-                    splitter = re.sub(' +', '\s+', splitters[k])
+                    splitter = re.sub(' +', '\\\s+', splitters[k])
                     regex += splitter
                 else:
                     header = splitters[k].strip('<').strip('>')
@@ -119,28 +135,24 @@ class LogParser:
             regex = re.compile('^' + regex + '$')
             return headers, regex
 
-        def log_to_dataframe(log_file, regex, headers, logformat):
+        def log_to_dataframe(log_file, regex, headers):
+            """ Function to transform log file to dataframe
+            """
             log_messages = []
-            linecount = 0
+            line_count = 0
             with open(log_file, 'r') as fin:
                 for line in fin.readlines():
                     try:
                         match = regex.search(line.strip())
                         message = [match.group(header) for header in headers]
                         log_messages.append(message)
-                        linecount += 1
+                        line_count += 1
                     except Exception as e:
                         pass
-            logdf = pd.DataFrame(log_messages, columns=headers)
-            logdf.insert(0, 'LineId', None)
-            logdf['LineId'] = [i + 1 for i in range(linecount)]
-            return logdf
+            log_df = pd.DataFrame(log_messages, columns=headers)
+            log_df.insert(0, 'LineId', None)
+            log_df['LineId'] = [i + 1 for i in range(line_count)]
+            return log_df
 
-        def preprocess(log):
-            for currentRex in self.rex:
-                log = re.sub(currentRex, '<*>', log)
-            return log
-
-        headers, regex = generate_logformat_regex(self.logformat)
-        self.df_log = log_to_dataframe(os.path.join(self.path, self.logname), regex, headers, self.logformat)
-        # self.df_log['Content_'] = self.df_log['Content'].map(preprocess)
+        headers, regex = generate_log_format_regex(self.log_format)
+        self.df_log = log_to_dataframe(self.in_path, regex, headers)

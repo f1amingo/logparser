@@ -1,6 +1,6 @@
 import collections
 import pandas as pd
-from logs.logdata import *
+from logparser.utils.logdata import *
 from logparser.ADC.log_signature import calc_signature
 
 # 读入数据

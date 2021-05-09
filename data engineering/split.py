@@ -5,7 +5,7 @@
 "." 一定不能使用
 """
 import re
-from logs.logdata import *
+from logparser.utils.logdata import *
 import pandas as pd
 
 result_dict = {
