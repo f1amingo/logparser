@@ -16,19 +16,23 @@ CONFIG_DICT[DATASET.Android].rex = [r'".*"']
 CONFIG_DICT[DATASET.Android].pre = 3
 CONFIG_DICT[DATASET.Apache]
 CONFIG_DICT[DATASET.BGL].rex = [r'\d+']
-CONFIG_DICT[DATASET.Hadoop].st = 0.4
+CONFIG_DICT[DATASET.BGL].st = 0.7
+# CONFIG_DICT[DATASET.Hadoop].st = 0.4
 CONFIG_DICT[DATASET.HDFS].rex = [r'(\d+\.){3}\d+(:\d+)?']
 CONFIG_DICT[DATASET.HealthApp]
-CONFIG_DICT[DATASET.HPC]
+CONFIG_DICT[DATASET.HPC].pre = 100
+CONFIG_DICT[DATASET.HPC].rex = [r'\d+']
 CONFIG_DICT[DATASET.Linux]
-CONFIG_DICT[DATASET.Mac].st = 0.7
+# CONFIG_DICT[DATASET.Mac].st = 0.7
 CONFIG_DICT[DATASET.Mac].rex = [r'([\w-]+\.){2,}[\w-]+']
-CONFIG_DICT[DATASET.OpenSSH].st = 0.8
+# CONFIG_DICT[DATASET.OpenSSH].st = 0.8
 CONFIG_DICT[DATASET.OpenSSH].rex = [r'(\d+\.){3}\d+', r'([\w-]+\.){2,}[\w-]+']
-CONFIG_DICT[DATASET.OpenStack]
-CONFIG_DICT[DATASET.Proxifier]
-CONFIG_DICT[DATASET.Spark]
-CONFIG_DICT[DATASET.Thunderbird].st = 0.8
+CONFIG_DICT[DATASET.OpenStack].rex = [r'/.*"', r'((\d+\.){3}\d+,?)+', r'\w+(-\w+){4}', r'\d+.?\d+']
+CONFIG_DICT[DATASET.OpenStack].pre = 100
+CONFIG_DICT[DATASET.Proxifier].pre = 0
+CONFIG_DICT[DATASET.Spark].pre = 0
+CONFIG_DICT[DATASET.Spark].st = 0.7
+# CONFIG_DICT[DATASET.Thunderbird].st = 0.8
 CONFIG_DICT[DATASET.Thunderbird].rex = [r'LOCAL\(0\)']
 CONFIG_DICT[DATASET.Windows].st = 0.8
 CONFIG_DICT[DATASET.Zookeeper]

@@ -5,7 +5,7 @@
 "." 一定不能使用
 """
 import re
-from logparser.utils.logdata import *
+from logparser.utils.dataset import *
 import pandas as pd
 
 result_dict = {
@@ -16,7 +16,9 @@ result_dict = {
 }
 for dataset in DATASET:
     print(dataset.value)
-    df = pd.read_csv(path_structured(dataset))
+    if dataset == DATASET.Proxifier or dataset == DATASET.OpenStack:
+        continue
+    df = pd.read_csv(log_path_structured(dataset))
     len_dict = {}
     pre_dict = {}
     for idx, row in df.iterrows():
@@ -24,10 +26,10 @@ for dataset in DATASET:
         content = row['Content']
         template = row['EventTemplate']
         content = re.sub('".*"', '<*>', content)
-        # 替换连续空格     # 替换连续空格
-        content = re.sub('\s+', ' ', content)
-        # content_split = list(filter(lambda x: x != '' and x != ' ', re.split('([( +)=,:])', content)))
-        content_split = re.split('([( +)=,:])', content)
+        # 替换连续空格
+        # content = re.sub('\s+', ' ', content)
+        content = re.sub('\(\)', '(null)', content)
+        content_split = re.split('([\s=,:|()\[\]]+)', content)
         if eventId in len_dict:
             if len_dict[eventId] != len(content_split):
                 result_dict['dataset'].append(dataset.value)

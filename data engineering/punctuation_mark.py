@@ -1,11 +1,14 @@
 """
 1.等于号会不会出现在变量中？
+2.哪些符号是“安全的”
+
+不可使用 "." "_" "-" "+" "/"
 """
 
 import pandas as pd
-from logparser.utils.logdata import *
+from logparser.utils.dataset import *
 
-sign = '='
+sign = '*'
 if __name__ == '__main__':
     result_dict = {
         'eventId': [],
@@ -14,9 +17,9 @@ if __name__ == '__main__':
     }
     for dataset in DATASET:
         print(dataset)
-        if dataset != DATASET.Android:
+        if dataset != DATASET.BGL:
             continue
-        df = pd.read_csv(path_structured(dataset))
+        df = pd.read_csv(log_path_structured(dataset))
         # 去重
         # df.drop_duplicates(subset=['EventId'], keep='first', inplace=True)
         for idx, row in df.iterrows():
@@ -28,4 +31,4 @@ if __name__ == '__main__':
                 result_dict['content'].append(content)
                 result_dict['template'].append(template)
     # save
-    pd.DataFrame(result_dict).to_csv('sign_equal.csv')
+    pd.DataFrame(result_dict).to_csv('%s.csv' % os.path.basename(__file__), index=False)

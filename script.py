@@ -11,8 +11,6 @@ import re
 # for seq in ['tag="View Lock"', 'tag="RILJ_ACK_WL"', 'tag="*launch*"', 'tag="WiredAccessoryManager"']:
 #     assert re.sub(r'"(.*)"', '<*>', 'tag="View Lock"') == 'tag=<*>'
 
-s1 = 'synchronized to LOCAL(0), stratum 10'
-s2 = 'iar 003a90fc dear 00b360e8'
-
-res = re.sub(r'LOCAL\(0\)', '<*>', s1)
+s1 = 'a  =1'
+res = re.split(r'([\s+|=])', s1)
 print(res)

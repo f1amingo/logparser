@@ -1,8 +1,15 @@
 import collections
 import re
+from datetime import datetime
 from typing import List
 from logparser.utils.dataset import *
-from .log_signature import calc_signature_list
+from .log_signature import calc_signature
+
+# DELIMITERS = {' ', '=', ',', ':', '|', '(', ')'}
+DELIMITERS = {' ', '=', ',', ':', '|', '(', ')', '[', ']'}
+# DELIMITERS = {' ', '=', ',', '|', '(', ')', '[', ']'}
+SPLIT_DELIMITER = '([' + ''.join(['\\' + k for k in DELIMITERS]) + '])'
+VAR = '<$>'
 
 
 class LogCluster:
@@ -32,6 +39,9 @@ class LogParser:
         self.log_cluster_dict = None
 
     def parse(self):
+        print('Parsing file: ', self.in_path)
+        start_time = datetime.now()
+
         self.load_data()
         self.log_cluster_dict = collections.defaultdict(LogCluster)
         eventId_list = []
@@ -51,20 +61,23 @@ class LogParser:
             eventId_list.append(this_eventId)
 
         self.dump_result(eventId_list)
+
+        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
         return self.out_path
 
     def preprocess(self, log_content: str) -> str:
         for currentRex in self.rex:
-            log_content = re.sub(currentRex, '<*>', log_content)
+            log_content = re.sub(currentRex, '<$>', log_content)
         # 替换连续空格
         line = re.sub('\s+', ' ', log_content)
         return line
 
     def split(self, log_content: str) -> List[str]:
-        return re.split('([ =,:()\[\]])', log_content)
+        # return re.split('([ =,:()\[\]])', log_content)
+        return re.split(SPLIT_DELIMITER, log_content)
 
     def calc_signature(self, token_list: List[str]) -> int:
-        return calc_signature_list(token_list)
+        return calc_signature(token_list)
 
     def search(self, log_cluster: LogCluster, token_list: List[str]) -> (int, List[str]):
         def log_sim(token_list1: list, token_list2: list) -> (float, float):
@@ -77,8 +90,20 @@ class LogParser:
                     return 0, 0
             count = self.pre
             for i in range(self.pre, n):
-                if token_list1[i] == '<*>' or token_list1[i] == token_list2[i]:
-                    count += 1
+                # if token_list1[i] == VAR or token_list2[i] == VAR or token_list1[i] == token_list2[i]:
+                #     count += 1
+                # 符号否决
+                isDel1 = token_list1[i] in DELIMITERS
+                isDel2 = token_list2[i] in DELIMITERS
+                if not isDel1 and not isDel2:
+                    if token_list1[i] == VAR or token_list2[i] == VAR or token_list1[i] == token_list2[
+                        i]:
+                        count += 1
+                elif isDel1 or isDel2:
+                    if token_list1[i] == token_list2[i]:
+                        count += 1
+                    else:
+                        return 0, 0
             return count / m, 0
 
         max_score = 0
@@ -104,7 +129,7 @@ class LogParser:
             if t1 == t2:
                 new_token_list.append(t1)
             else:
-                new_token_list.append('<*>')
+                new_token_list.append(VAR)
         return new_token_list
 
     def update_template(self, log_cluster: LogCluster, token_list: List[str], idx: int):
