@@ -3,39 +3,47 @@ Description : This file implements the Drain algorithm for log parsing
 Author      : LogPAI team
 License     : MIT
 """
-import collections
-import re
-import os
-import pandas as pd
+
 import hashlib
+import os
+import re
+import pandas as pd
 from datetime import datetime
-from .ADC import log_signature
+from typing import List
+from .log_signature import calc_signature
 
 
-class Logcluster:
-    def __init__(self, logTemplate='', logIDL=None):
-        self.logTemplate = logTemplate
-        if logIDL is None:
-            logIDL = []
-        self.logIDL = logIDL
-        ### template index in the tree leaf template group
-        self.template_idx = None
+# 一个叶子节点就是一个LogCluster
+class LogCluster:
+    def __init__(self, template_token_list: List[str], log_id_list: List[int]):
+        self.template_token_list = template_token_list
+        self.log_id_list = log_id_list
+        self.template_id = None
 
 
+# 树节点
 class Node:
-    def __init__(self, childD=None, depth=0, digitOrtoken=None):
-        if childD is None:
-            childD = dict()
-        self.childD = childD
+    def __init__(self, childD=None, depth=0, digitOrToken=None):
+        self.childD = {} if childD is None else childD
         self.depth = depth
-        self.digitOrtoken = digitOrtoken
-        ### how much template in this leaf node
+        self.digitOrToken = digitOrToken
         self.template_count = 0
+
+
+def get_template(seq1, seq2):
+    assert len(seq1) == len(seq2)
+    res = []
+    for t1, t2 in zip(seq1, seq2):
+        if t1 == t2:
+            res.append(t1)
+        else:
+            res.append('<*>')
+    return res
 
 
 class LogParser:
     def __init__(self, log_format, indir='./', outdir='./result/', depth=4, st=0.4,
-                 maxChild=100, rex=[], keep_para=True):
+                 maxChild=100, rex=None, keep_para=True):
         """
         Attributes
         ----------
@@ -44,60 +52,49 @@ class LogParser:
             depth : depth of all leaf nodes
             st : similarity threshold
             maxChild : max number of children of an internal node
-            logName : the name of the input file containing raw log messages
-            savePath : the output path stores the file containing structured logs
+            log_name : the name of the input file containing raw log messages
+            save_path : the output path stores the file containing structured logs
         """
         self.path = indir
         self.depth = depth - 2
         self.st = st
         self.maxChild = maxChild
-        self.logName = None
-        self.savePath = outdir
+        self.log_name = None
+        self.save_path = outdir
         self.df_log = None
         self.log_format = log_format
-        self.rex = rex
+        self.rex = [] if rex is None else rex
         self.keep_para = keep_para
 
-    def hasNumbers(self, s):
-        return any(char.isdigit() for char in s)
-
-    def treeSearch(self, rn, seq):
-        # retLogClust = None
-
-        seqLen = len(seq)
-        if seqLen not in rn.childD:
-            return -1, None
-
-        parentn = rn.childD[seqLen]
-
-        currentDepth = 1
-        for token in seq:
-            if currentDepth >= self.depth or currentDepth > seqLen:
+    def tree_search(self, root, token_list):
+        seq_len = len(token_list)
+        # 长度层，判断长度
+        if seq_len not in root.childD:
+            return 0, None
+        len_node = root.childD[seq_len]  # 长度层的节点
+        depth = 1
+        for token in token_list:
+            if depth >= self.depth or depth > seq_len:
                 break
-
-            if token in parentn.childD:
-                parentn = parentn.childD[token]
-            elif '<*>' in parentn.childD:
-                parentn = parentn.childD['<*>']
+            if token in len_node.childD:
+                len_node = len_node.childD[token]
+            elif '<*>' in len_node.childD:
+                len_node = len_node.childD['<*>']
             else:
-                return -1,None
-            currentDepth += 1
-
-        logClustL = parentn.childD
-
-        # retLogClust = self.fastMatch(logClustL, seq)
-        # return retLogClust
-        return self.fastMatch(logClustL, seq)
+                return 0, None
+            depth += 1
+        return self.fastMatch(len_node.childD, token_list)
 
     def addSeqToPrefixTree(self, rn, logClust):
-        ### template_idx equals list length
-        logClust.template_idx = rn.template_count
-        ### update template_count
-        rn.template_count += 1
+        def has_number(s):
+            return any(char.isdigit() for char in s)
 
-        seqLen = len(logClust.logTemplate)
+        logClust.template_id = rn.template_count  # 模板id等于序号
+        rn.template_count += 1  # 这个根上的模板总数加一
+
+        seqLen = len(logClust.template_token_list)
         if seqLen not in rn.childD:
-            firtLayerNode = Node(depth=1, digitOrtoken=seqLen)
+            firtLayerNode = Node(depth=1, digitOrToken=seqLen)
             rn.childD[seqLen] = firtLayerNode
         else:
             firtLayerNode = rn.childD[seqLen]
@@ -105,9 +102,9 @@ class LogParser:
         parentn = firtLayerNode
 
         currentDepth = 1
-        for token in logClust.logTemplate:
+        # 只有一个token时，结果是不对的
+        for token in logClust.template_token_list:
 
-            ### when there is only one token, not right
             # Add current log cluster to the leaf node
             if currentDepth >= self.depth or currentDepth > seqLen:
                 # if len(parentn.childD) == 0:
@@ -116,23 +113,23 @@ class LogParser:
                 #     parentn.childD.append(logClust)
                 break
 
-            # If token not matched in this layer of existing tree.
+            # If token not matched in this layer of existing tree. 
             if token not in parentn.childD:
-                if not self.hasNumbers(token):
+                if not has_number(token):
                     if '<*>' in parentn.childD:
                         if len(parentn.childD) < self.maxChild:
-                            newNode = Node(depth=currentDepth + 1, digitOrtoken=token)
+                            newNode = Node(depth=currentDepth + 1, digitOrToken=token)
                             parentn.childD[token] = newNode
                             parentn = newNode
                         else:
                             parentn = parentn.childD['<*>']
                     else:
                         if len(parentn.childD) + 1 < self.maxChild:
-                            newNode = Node(depth=currentDepth + 1, digitOrtoken=token)
+                            newNode = Node(depth=currentDepth + 1, digitOrToken=token)
                             parentn.childD[token] = newNode
                             parentn = newNode
                         elif len(parentn.childD) + 1 == self.maxChild:
-                            newNode = Node(depth=currentDepth + 1, digitOrtoken='<*>')
+                            newNode = Node(depth=currentDepth + 1, digitOrToken='<*>')
                             parentn.childD['<*>'] = newNode
                             parentn = newNode
                         else:
@@ -140,7 +137,7 @@ class LogParser:
 
                 else:
                     if '<*>' not in parentn.childD:
-                        newNode = Node(depth=currentDepth + 1, digitOrtoken='<*>')
+                        newNode = Node(depth=currentDepth + 1, digitOrToken='<*>')
                         parentn.childD['<*>'] = newNode
                         parentn = newNode
                     else:
@@ -152,7 +149,7 @@ class LogParser:
 
             currentDepth += 1
 
-        ### add to logClust
+        # 添加到 logClusterList
         if len(parentn.childD) == 0:
             parentn.childD = [logClust]
         else:
@@ -176,83 +173,70 @@ class LogParser:
         return retVal, numOfPar
 
     def fastMatch(self, logClustL, seq):
-        # retLogClust = None
+        retLogClust = None
 
         maxSim = -1
         maxNumOfPara = -1
         maxClust = None
-        ### template index
-        max_idx = -1
+        maxIdx = -1  # 匹配的簇对应的索引
 
-        # for logClust in logClustL:
-        for idx, logClust in enumerate(logClustL):
-            curSim, curNumOfPara = self.seqDist(logClust.logTemplate, seq)
+        for i, logClust in enumerate(logClustL):
+            curSim, curNumOfPara = self.seqDist(logClust.template_token_list, seq)
             if curSim > maxSim or (curSim == maxSim and curNumOfPara > maxNumOfPara):
                 maxSim = curSim
                 maxNumOfPara = curNumOfPara
                 maxClust = logClust
-                ### update
-                max_idx = idx
+                maxIdx = i
 
+        if maxSim < self.st:
+            return len(logClustL), None
+        else:
+            return maxIdx, maxClust
         # if maxSim >= self.st:
         #     retLogClust = maxClust
         # return retLogClust
-        if maxSim < self.st:
-            return -1, None
-        else:
-            return max_idx, maxClust
 
-    def getTemplate(self, seq1, seq2):
-        assert len(seq1) == len(seq2)
-        retVal = []
-
-        i = 0
-        for word in seq1:
-            if word == seq2[i]:
-                retVal.append(word)
-            else:
-                retVal.append('<*>')
-
-            i += 1
-
-        return retVal
+    # 输出自定义结果
+    def outputEventId(self, event_id_list):
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
+        self.df_log['EventId'] = event_id_list
+        self.df_log.to_csv(os.path.join(self.save_path, self.log_name + '_structured.csv'), index=False)
 
     def outputResult(self, logClustL):
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
+
         log_templates = [0] * self.df_log.shape[0]
         log_templateids = [0] * self.df_log.shape[0]
         df_events = []
         for logClust in logClustL:
-            template_str = ' '.join(logClust.logTemplate)
-            occurrence = len(logClust.logIDL)
-            template_id = hashlib.md5(template_str.encode('utf-8')).hexdigest()[0:8]
-            for logID in logClust.logIDL:
-                logID -= 1
-                log_templates[logID] = template_str
-                log_templateids[logID] = template_id
+            template_str = ' '.join(logClust.template_token_list)
+            occurrence = len(logClust.log_id_list)
+            # template_id = hashlib.md5(template_str.encode('utf-8')).hexdigest()[0:8]
+            template_id = logClust.template_id
+            for log_id in logClust.log_id_list:
+                log_id -= 1
+                log_templates[log_id] = template_str
+                log_templateids[log_id] = template_id
             df_events.append([template_id, template_str, occurrence])
 
-        df_event = pd.DataFrame(df_events, columns=['EventId', 'EventTemplate', 'Occurrences'])
+        # df_event = pd.DataFrame(df_events, columns=['EventId', 'EventTemplate', 'Occurrences'])
         self.df_log['EventId'] = log_templateids
         self.df_log['EventTemplate'] = log_templates
 
         if self.keep_para:
             self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1)
-        self.df_log.to_csv(os.path.join(self.savePath, self.logName + '_structured.csv'), index=False)
+        self.df_log.to_csv(os.path.join(self.save_path, self.log_name + '_structured.csv'), index=False)
 
         occ_dict = dict(self.df_log['EventTemplate'].value_counts())
         df_event = pd.DataFrame()
         df_event['EventTemplate'] = self.df_log['EventTemplate'].unique()
         df_event['EventId'] = df_event['EventTemplate'].map(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[0:8])
+        # df_event['EventId'] = self.df_log['EventId'].unique()
         df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
-        df_event.to_csv(os.path.join(self.savePath, self.logName + '_templates.csv'), index=False,
+        df_event.to_csv(os.path.join(self.save_path, self.log_name + '_templates.csv'), index=False,
                         columns=["EventId", "EventTemplate", "Occurrences"])
-
-    ### output our result
-    def outputEventId(self, event_id_list):
-        if not os.path.exists(self.savePath):
-            os.makedirs(self.savePath)
-        self.df_log['EventId'] = event_id_list
-        self.df_log.to_csv(os.path.join(self.savePath, self.logName + '_structured.csv'), index=False)
 
     def printTree(self, node, dep):
         pStr = ''
@@ -262,9 +246,9 @@ class LogParser:
         if node.depth == 0:
             pStr += 'Root'
         elif node.depth == 1:
-            pStr += '<' + str(node.digitOrtoken) + '>'
+            pStr += '<' + str(node.digitOrToken) + '>'
         else:
-            pStr += node.digitOrtoken
+            pStr += node.digitOrToken
 
         print(pStr)
 
@@ -273,66 +257,68 @@ class LogParser:
         for child in node.childD:
             self.printTree(node.childD[child], dep + 1)
 
-    def parse(self, logName):
-        print('Parsing file: ' + os.path.join(self.path, logName))
+    def parse(self, log_name: str):
+        print('Parsing file: ' + os.path.join(self.path, log_name))
         start_time = datetime.now()
-        self.logName = logName
-        # rootNode = Node()
-        logCluL = []
-        ### one bin for one signature
-        bin_dict = collections.defaultdict(Node)
-        ### save eventId for evaluation
-        eventId_list = []
+        self.log_name = log_name
+        # root_node = Node()
+        all_cluster_list = []  # 所有的logCluster
+        sig_bin = {}
+        # 保存解析的EventId
+        event_id_list = []
 
         self.load_data()
 
-        count = 0
+        # 遍历每一行
         for idx, line in self.df_log.iterrows():
-            logID = line['LineId']
-            logmessageL = self.preprocess(line['Content']).strip().split()
-            # logmessageL = filter(lambda x: x != '', re.split('[\s=:,]', self.preprocess(line['Content'])))
-            ### calculate log signature
-            log_sig = log_signature(logmessageL)
-            ### get the root node for log_sig
-            this_root = bin_dict[log_sig]
-            # matchCluster = self.treeSearch(rootNode, logmessageL)
-            template_idx, matchCluster = self.treeSearch(this_root, logmessageL)
+            log_content = line['Content']
+            log_id = line['LineId']
+            # 预处理，token化
+            log_token_list = self.preprocess(log_content).strip().split()
+            # 计算签名
+            log_sig = calc_signature(log_token_list)
+            # log_sig = 0
+            if log_sig not in sig_bin:
+                sig_bin[log_sig] = Node()
+            # 每个签名对应一颗树
+            this_root = sig_bin[log_sig]
 
-            # Match no existing log cluster
-            if matchCluster is None:
-                newCluster = Logcluster(logTemplate=logmessageL, logIDL=[logID])
-                logCluL.append(newCluster)
-                # self.addSeqToPrefixTree(rootNode, newCluster)
-                self.addSeqToPrefixTree(this_root, newCluster)
+            # 搜索树，找到匹配的Cluster
+            # matched_cluster = self.tree_search(root_node, log_token_list)
+            match_idx, matched_cluster = self.tree_search(this_root, log_token_list)
+            # parsed_event_id = log_sig * 100 + matched_cluster.template_id
+            # event_id_list.append(parsed_event_id)
+            # cluster_template_id = matched_cluster.template_id
+            if matched_cluster is None:
+                # 没有匹配的 Cluster
+                new_cluster = LogCluster(template_token_list=log_token_list, log_id_list=[log_id])
+                all_cluster_list.append(new_cluster)
+                # self.addSeqToPrefixTree(root_node, new_cluster)
+                self.addSeqToPrefixTree(this_root, new_cluster)
 
-                ### template_idx
-                template_idx = newCluster.template_idx
-            # Add the new log message to the existing cluster
+                cluster_template_id = new_cluster.template_id
             else:
-                newTemplate = self.getTemplate(logmessageL, matchCluster.logTemplate)
-                matchCluster.logIDL.append(logID)
-                if ' '.join(newTemplate) != ' '.join(matchCluster.logTemplate):
-                    matchCluster.logTemplate = newTemplate
+                # 把日志消息添加到已有的 Cluster
+                new_template_token_list = get_template(log_token_list, matched_cluster.template_token_list)
+                matched_cluster.log_id_list.append(log_id)
+                if ' '.join(new_template_token_list) != ' '.join(matched_cluster.template_token_list):
+                    matched_cluster.template_token_list = new_template_token_list
 
-                ### template_idx
-                template_idx = matchCluster.template_idx
+                cluster_template_id = matched_cluster.template_id
 
-            eventId_list.append(log_sig * 1000 + template_idx)
+            event_id_list.append(log_sig * 1000 + cluster_template_id)
 
-            count += 1
+            count = idx + 1
             if count % 1000 == 0 or count == len(self.df_log):
                 print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)))
 
-        # if not os.path.exists(self.savePath):
-        #     os.makedirs(self.savePath)
-        # self.outputResult(logCluL)
-        self.outputEventId(eventId_list)
-
+        self.outputEventId(event_id_list)
+        # self.outputResult(all_cluster_list)
         print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
 
     def load_data(self):
         headers, regex = self.generate_logformat_regex(self.log_format)
-        self.df_log = self.log_to_dataframe(os.path.join(self.path, self.logName), regex, headers, self.log_format)
+        self.df_log = self.log_to_dataframe(os.path.join(self.path, self.log_name), regex, headers, self.log_format)
 
     def preprocess(self, line):
         for currentRex in self.rex:

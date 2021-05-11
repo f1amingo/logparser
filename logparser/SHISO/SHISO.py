@@ -246,7 +246,7 @@ class LogParser:
             r = 2.0*simTuple / (len(currentG)+len(G))
             if r>self.formatLookupThreshold and r > rmax:
                 rmax = r
-                fmax = currentFormat.split()
+                fmax = currentFormat.log_split()
                 nodemax = currentNode
 
 

@@ -22,29 +22,23 @@ Surface(name=com.tencent.qt.qtl/com.tencent.video.player.activity.PlayerActivity
 """
 
 import pandas as pd
-from logparser.utils.logdata import *
+from logparser.utils.dataset import *
 import collections
-from logparser.ADC.log_signature import calc_signature
+from logparser.ADC import log_signature
 
 if __name__ == '__main__':
-    result_dict = {
-        'dataset': [],
-        'eventId': [],
-        'signature': [],
-        'content': [],
-        'template': [],
-    }
+    result_dict = collections.defaultdict(list)
     for dataset in DATASET:
         print(dataset)
         # if dataset != DATASET.Android:
         #     continue
         eventId_signature = collections.defaultdict()
-        df = pd.read_csv(path_structured(dataset))
+        df = pd.read_csv(log_path_structured(dataset))
         for idx, row in df.iterrows():
             content = row['Content']
             eventId = row['EventId']
             template = row['EventTemplate']
-            sig = calc_signature(content)
+            sig = log_signature(content)
             if eventId not in eventId_signature:
                 eventId_signature[eventId] = sig
             else:
@@ -55,4 +49,4 @@ if __name__ == '__main__':
                     result_dict['content'].append(content)
                     result_dict['template'].append(template)
 
-pd.DataFrame(result_dict).to_csv('correctness.csv')
+    pd.DataFrame(result_dict).to_csv('%s.csv' % os.path.basename(__file__), index=False)

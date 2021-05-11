@@ -6,7 +6,7 @@ result = []
 for idx, row in df.iterrows():
     template = row['EventTemplate']
     eventId = row['EventId']
-    split_list = template.split()
+    split_list = template.log_split()
     para_count = 0
     for token in split_list:
         if token.find('<*>') > -1:

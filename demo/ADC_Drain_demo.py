@@ -1,11 +1,11 @@
 import os
 from logparser import evaluator
 from benchmark.ADC_Drain_benchmark import benchmark_settings
-import logparser.ADC.ADC_Drain_Sim as ADC_Drain
+import logparser.ADC.ADC_Drain as ADC_Drain
 
 # The input directory of log file
 output_dir = 'ADC_Drain_result/'  # The output directory of parsing results
-one_setting = benchmark_settings['Windows']
+one_setting = benchmark_settings['Thunderbird']
 log_file = os.path.basename(one_setting['log_file'])
 input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 

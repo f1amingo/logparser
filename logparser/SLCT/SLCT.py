@@ -170,7 +170,7 @@ def tempProcess(tempPara):
 def matchTempLog(templates, logs):
     len_temp = {}
     for tidx, temp in enumerate(templates):
-        tempL = temp.split()
+        tempL = temp.log_split()
         templen = len(tempL)
         if templen not in len_temp:
             len_temp[templen] = [(tidx, tempL)]
@@ -178,7 +178,7 @@ def matchTempLog(templates, logs):
             len_temp[templen].append((tidx, tempL))
     logid_groupid = []
     for idx, log in enumerate(logs):
-        logL = log.split()
+        logL = log.log_split()
         logid = idx+1
         if len(logL) in len_temp:
             logid_groupid.append([idx + 1, get_groupid(logL, len_temp[len(logL)])])

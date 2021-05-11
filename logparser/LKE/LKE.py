@@ -54,7 +54,7 @@ class LogParser:
         
         self.dedup_lines = self.df_log['Content'].map(self.preprocess)
         for line in self.dedup_lines:
-            wordSeq = line.strip().split()
+            wordSeq = line.strip().log_split()
             self.wordLen.append(len(wordSeq))
             self.wordLL.append(tuple(wordSeq))
 

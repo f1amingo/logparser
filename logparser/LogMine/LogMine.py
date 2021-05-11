@@ -122,7 +122,7 @@ class LogParser():
         return log_merged
 
     def pair_merge(self, loga, logb):
-        loga, logb = alignment.water(loga.split(), logb.split())
+        loga, logb = alignment.water(loga.log_split(), logb.log_split())
         logn = []
         for idx, value in enumerate(loga):
             logn.append('<*>' if value != logb[idx] else value)
@@ -140,8 +140,8 @@ class LogParser():
 
     def msgDist(self, seqP, seqQ):
         dis = 1
-        seqP = seqP.split()
-        seqQ = seqQ.split()
+        seqP = seqP.log_split()
+        seqQ = seqQ.log_split()
         maxlen = max(len(seqP), len(seqQ))
         minlen = min(len(seqP), len(seqQ))
         for i in range(minlen):
@@ -150,8 +150,8 @@ class LogParser():
 
     def patternDist(self, seqP, seqQ):
         dis = 1
-        seqP = seqP.split()
-        seqQ = seqQ.split()
+        seqP = seqP.log_split()
+        seqQ = seqQ.log_split()
         maxlen = max(len(seqP), len(seqQ))
         minlen = min(len(seqP), len(seqQ))
         for i in range(minlen):

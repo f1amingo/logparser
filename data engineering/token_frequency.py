@@ -11,7 +11,7 @@ for dataset in DATASET:
     df = pd.read_csv(path_structured(dataset))
     counter = collections.defaultdict(int)
     for idx, row in df.iterrows():
-        split_list = row['Content'].split()
+        split_list = row['Content'].log_split()
         for token in split_list:
             counter[token] += 1
     sorted_counter = dict(sorted(counter.items(), key=lambda item: -item[1]))

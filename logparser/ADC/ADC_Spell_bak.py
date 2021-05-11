@@ -248,17 +248,15 @@ class LogParser:
         event_id_list = []  # 保存解析的EventId
 
         for idx, line in self.df_log.iterrows():
-            # 计算签名
-            # log_sig = 0
-            log_sig = calc_signature(line['Content'])
+            logID = line['LineId']
+            logmessageL = list(filter(lambda x: x != '', re.split(r'[\s=:,]', self.preprocess(line['Content']))))
+            constLogMessL = [w for w in logmessageL if w != '<*>']
+
+            log_sig = calc_signature(logmessageL)
             if log_sig not in sig_bins:
                 sig_bins[log_sig] = (Node(), [])
             rootNode, logCluL = sig_bins[log_sig]
             cur_templated_idx = None
-
-            logID = line['LineId']
-            logmessageL = list(filter(lambda x: x != '', re.split(r'[\s=:,]', self.preprocess(line['Content']))))
-            constLogMessL = [w for w in logmessageL if w != '<*>']
 
             # Find an existing matched log cluster
             matchCluster = self.PrefixTreeMatch(rootNode, constLogMessL, 0)

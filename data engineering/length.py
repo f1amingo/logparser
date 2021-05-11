@@ -43,7 +43,7 @@ Mac
 defaultdict(<class 'int'>, {'E265': 2, 'E210': 3})
 """
 
-from logparser.utils.logdata import *
+from logparser.utils.dataset import *
 import pandas as pd
 import collections
 
@@ -54,7 +54,7 @@ eventId_list = []
 dataset_list = []
 for dataset in DATASET:
     print(dataset.value)
-    df = pd.read_csv(path_structured(dataset))
+    df = pd.read_csv(log_path_structured(dataset))
     counter = collections.defaultdict(int)
     len_dict = {}
     for idx, row in df.iterrows():
@@ -62,7 +62,7 @@ for dataset in DATASET:
         content = row['Content']
         template = row['EventTemplate']
         # template_split = template.split()
-        content_split = content.split()
+        content_split = content.log_split()
         # content_split = shlex.split(content)
         if eventId in len_dict:
             len_d = len_dict[eventId]
@@ -91,4 +91,4 @@ out_df['length'] = message_length
 out_df['eventId'] = eventId_list
 out_df['content'] = content_list
 out_df['template'] = template_list
-out_df.to_csv('length.csv', index=False)
+out_df.to_csv('%s.csv' % os.path.basename(__file__), index=False)

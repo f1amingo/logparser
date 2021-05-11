@@ -1,5 +1,4 @@
 import collections
-import hashlib
 import os
 import re
 import pandas as pd
@@ -116,7 +115,7 @@ class LogParser:
             log_content = line['Content']
             log_id = line['LineId']
             # log_token_list = self.preprocess(log_content).strip().split()
-            log_token_list = log_content.split()
+            log_token_list = log_content.log_split()
             log_sig = calc_signature(log_content)
             template_list = bin_dict[log_sig]
             template_idx, template = self.fastMatch(template_list, log_token_list)

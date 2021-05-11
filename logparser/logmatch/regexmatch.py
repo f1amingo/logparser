@@ -55,7 +55,7 @@ class PatternMatch(object):
         if not event_Id:
             event_Id = self._generate_hash_eventId(event_template)
         if self.optimized:
-            start_token = event_template.split(' ')[0]
+            start_token = event_template.log_split(' ')[0]
             if re.search(r'<.*?>', start_token):
                 start_token = '<*>'
             self.template_match_dict[start_token][self._generate_template_regex(event_template)] = (event_Id, event_template)
@@ -142,7 +142,7 @@ def regex_match(msg, template_match_dict, optimized):
     match_dict = template_match_dict
     parameter_list = []
     if optimized:
-        start_token = msg.split(' ')[0]
+        start_token = msg.log_split(' ')[0]
         if start_token in template_match_dict:
             match_dict = template_match_dict[start_token]
             if len(match_dict) > 1:

@@ -3,11 +3,10 @@
 1. 每个桶的模板数目：最多、最少、平均、方差
 """
 
-import pandas as pd
 import numpy as np
-from logparser.utils.logdata import *
+from logparser.utils.dataset import *
 import collections
-from logparser.ADC.log_signature import calc_signature
+from logparser.ADC import log_signature, log_split
 
 
 class BinEntry:
@@ -17,31 +16,21 @@ class BinEntry:
 
 
 if __name__ == '__main__':
-    result_dict = {
-        'dataset': [],
-        'template_count': [],
-        'bin_count': [],
-        'top1': [],
-        'top2': [],
-        'top3': [],
-        'mean': [],
-        'std': [],
-        'min': [],
-    }
+    result_dict = collections.defaultdict(list)
     for dataset in DATASET:
         print(dataset)
         # if dataset != DATASET.Mac:
         #     continue
-        df = pd.read_csv(path_structured(dataset))
+        df = pd.read_csv(log_path_structured(dataset))
         # df.drop(['Date', 'Time', 'Pid', 'Level', 'Component'], axis=1, inplace=True, errors='ignore')
-        # 去重
         df.drop_duplicates(subset=['EventId'], keep='first', inplace=True)
         bin_dict = collections.defaultdict(BinEntry)
         for idx, row in df.iterrows():
-            content = row['Content']
-            sig = calc_signature(content)
-            bin_dict[sig].sig = sig
-            bin_dict[sig].templates.append(content)
+            log_content = row['Content']
+            log_token_list = log_split(log_content)
+            log_sig = log_signature(log_token_list)
+            bin_dict[log_sig].sig = log_sig
+            bin_dict[log_sig].templates.append(log_content)
         count_list = [len(bin_dict[k].templates) for k in bin_dict]
         count_list.sort()
         result_dict['dataset'].append(dataset.value)
@@ -52,6 +41,7 @@ if __name__ == '__main__':
         result_dict['top2'].append(count_list[-2])
         result_dict['top3'].append(count_list[-3])
         result_dict['mean'].append(np.mean(count_list))
+        result_dict['medium'].append(count_list[len(count_list) // 2])
         result_dict['std'].append(np.std(count_list))
 
-pd.DataFrame(result_dict).to_csv('collision.csv')
+    pd.DataFrame(result_dict).to_csv('%s.csv' % os.path.basename(__file__), index=False)

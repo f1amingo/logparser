@@ -74,7 +74,7 @@ class LogParser:
         for idx, log in self.df_log['Content_'].iteritems():
             para_count = 0
 
-            tokens = log.split()
+            tokens = log.log_split()
             for token in tokens:
                 if token == "<*>":
                     para_count += 1

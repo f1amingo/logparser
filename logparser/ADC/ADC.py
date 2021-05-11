@@ -3,13 +3,53 @@ import re
 from datetime import datetime
 from typing import List
 from logparser.utils.dataset import *
-from .log_signature import calc_signature
 
-# DELIMITERS = {' ', '=', ',', ':', '|', '(', ')'}
 DELIMITERS = {' ', '=', ',', ':', '|', '(', ')', '[', ']'}
-# DELIMITERS = {' ', '=', ',', '|', '(', ')', '[', ']'}
 SPLIT_DELIMITER = '([' + ''.join(['\\' + k for k in DELIMITERS]) + '])'
-VAR = '<$>'
+VAR = '<$>'  # replace variable with
+
+CHAR_LIST = [
+    '=',
+    ';',
+    '"',
+    '*',
+]
+TOKEN_LIST = [
+    'true',  # Android
+    'SPP.',  # Windows E35
+    '\'Active\'',  # Mac E258
+]
+CHAR_DICT = {k: 0 for k in CHAR_LIST}
+TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
+
+
+def dict2Int(dic: dict, base: int = 0) -> int:
+    for v in dic.values():
+        digit = 0 if v == 0 else 1
+        base = 2 * base + digit
+    return base
+
+
+def log_split(log_content: str) -> List[str]:
+    # return re.split('([ =,:()\[\]])', log_content)
+    return re.split(SPLIT_DELIMITER, log_content)
+
+
+def log_signature(token_list: List[str]) -> int:
+    char_dict = CHAR_DICT.copy()  # char-level feature
+    token_dict = TOKEN_DICT.copy()  # token-level feature
+
+    for token in token_list:
+        for ch in token:
+            if ch in char_dict:
+                char_dict[ch] += 1
+        if token in TOKEN_DICT:
+            token_dict[token] += 1
+
+    base = dict2Int(char_dict, 0)
+    base = dict2Int(token_dict, base)
+    base = base * 100 + len(token_list)  # length feature
+    return base
 
 
 class LogCluster:
@@ -48,8 +88,8 @@ class LogParser:
 
         for idx, line in self.df_log.iterrows():
             log_content = self.preprocess(line['Content'])
-            log_token_list = self.split(log_content)
-            log_sig = self.calc_signature(log_token_list)
+            log_token_list = log_split(log_content)
+            log_sig = log_signature(log_token_list)
             log_cluster = self.log_cluster_dict[log_sig]
             template_idx, template_token_list = self.search(log_cluster, log_token_list)
             if template_idx == -1:
@@ -71,13 +111,6 @@ class LogParser:
         # 替换连续空格
         line = re.sub('\s+', ' ', log_content)
         return line
-
-    def split(self, log_content: str) -> List[str]:
-        # return re.split('([ =,:()\[\]])', log_content)
-        return re.split(SPLIT_DELIMITER, log_content)
-
-    def calc_signature(self, token_list: List[str]) -> int:
-        return calc_signature(token_list)
 
     def search(self, log_cluster: LogCluster, token_list: List[str]) -> (int, List[str]):
         def log_sim(token_list1: list, token_list2: list) -> (float, float):

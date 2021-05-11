@@ -106,8 +106,6 @@ class LogParser:
         return retLogClust
 
     def LCSMatch(self, logClustL, seq):
-        if seq[0] == 'Verification':
-            a = 1
         maxLen = -1
         maxClust = None
         maxIdx = -1
