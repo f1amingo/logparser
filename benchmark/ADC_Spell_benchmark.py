@@ -1,7 +1,6 @@
 from logparser import evaluator
 import os
 import pandas as pd
-
 from logparser.ADC import ADC_Spell
 
 input_dir = '../logs/'  # The input directory of log file
@@ -67,7 +66,7 @@ benchmark_settings = {
     'Mac': {
         'log_file': 'Mac/Mac_2k.log',
         'log_format': '<Month>  <Date> <Time> <User> <Component>\[<PID>\]( \(<Address>\))?: <Content>',
-        'regex': [r'([\w-]+\.){2,}[\w-]+'],
+        'regex': [r'^com.apple.*:', r'([\w-]+\.){2,}[\w-]+', ],
         'tau': 0.6
     },
 

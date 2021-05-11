@@ -74,7 +74,7 @@ benchmark_settings = {
     'Mac': {
         'log_file': 'Mac/Mac_2k.log',
         'log_format': '<Month>  <Date> <Time> <User> <Component>\[<PID>\]( \(<Address>\))?: <Content>',
-        'regex': [r'([\w-]+\.){2,}[\w-]+'],
+        'regex': [r'^com.apple.*:', r'([\w-]+\.){2,}[\w-]+'],
         'st': 0.7,
         'depth': 6
     },
@@ -114,7 +114,7 @@ benchmark_settings = {
     'Thunderbird': {
         'log_file': 'Thunderbird/Thunderbird_2k.log',
         'log_format': '<Label> <Timestamp> <Date> <User> <Month> <Day> <Time> <Location> <Component>(\[<PID>\])?: <Content>',
-        'regex': [r'(\d+\.){3}\d+',r'LOCAL\(0\)'],
+        'regex': [r'(\d+\.){3}\d+', r'LOCAL\(0\)'],
         'st': 0.5,
         'depth': 4
     },

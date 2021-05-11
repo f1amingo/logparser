@@ -23,8 +23,8 @@ CONFIG_DICT[DATASET.HealthApp]
 CONFIG_DICT[DATASET.HPC].pre = 100
 CONFIG_DICT[DATASET.HPC].rex = [r'\d+']
 CONFIG_DICT[DATASET.Linux]
-# CONFIG_DICT[DATASET.Mac].st = 0.7
-CONFIG_DICT[DATASET.Mac].rex = [r'([\w-]+\.){2,}[\w-]+']
+CONFIG_DICT[DATASET.Mac].st = 0.85
+CONFIG_DICT[DATASET.Mac].rex = [r'^com.apple.*:']
 # CONFIG_DICT[DATASET.OpenSSH].st = 0.8
 CONFIG_DICT[DATASET.OpenSSH].rex = [r'(\d+\.){3}\d+', r'([\w-]+\.){2,}[\w-]+']
 CONFIG_DICT[DATASET.OpenStack].rex = [r'/.*"', r'((\d+\.){3}\d+,?)+', r'\w+(-\w+){4}', r'\d+.?\d+']

@@ -18,6 +18,10 @@ TOKEN_LIST = [
     'true',  # Android
     'SPP.',  # Windows E35
     '\'Active\'',  # Mac E258
+    'HTTPS',  # Proxifier E1
+    'with',  # Proxifier E4
+
+    'has',
 ]
 CHAR_DICT = {k: 0 for k in CHAR_LIST}
 TOKEN_DICT = {k: 0 for k in TOKEN_LIST}

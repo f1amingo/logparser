@@ -1,15 +1,14 @@
 import os
 from logparser import evaluator
 import logparser.ADC.ADC_Spell as ADC_Spell
-from benchmark.Spell_benchmark import benchmark_settings
+from benchmark.ADC_Spell_benchmark import benchmark_settings
 
 # The input directory of log file
 output_dir = 'ADC_Spell_result/'  # The output directory of parsing results
-one_setting = benchmark_settings['OpenSSH']
+one_setting = benchmark_settings['Proxifier']
 log_file = os.path.basename(one_setting['log_file'])
 input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 
-ADC_Spell
 parser = ADC_Spell.LogParser(
     indir=input_dir,
     outdir=output_dir,

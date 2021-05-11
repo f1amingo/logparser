@@ -11,6 +11,8 @@ import re
 # for seq in ['tag="View Lock"', 'tag="RILJ_ACK_WL"', 'tag="*launch*"', 'tag="WiredAccessoryManager"']:
 #     assert re.sub(r'"(.*)"', '<*>', 'tag="View Lock"') == 'tag=<*>'
 
-s1 = 'a  =1'
-res = re.split(r'([\s+|=])', s1)
+foo = "com.apple.icloud.fmfd.heartbeat: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 424575 seconds.  Ignoring."
+s = "com.apple.ical.sync.x-coredata://DB05755C-483D-44B7-B93B-ED06E57FF420/CalDAVPrincipal/p11: scheduler_evaluate_activity told me to run this job; however, but the start time isn't for 59 seconds.  Ignoring."
+res = re.sub(r'^com.apple.*:', '<*>', s)
 print(res)
+print(re.sub(r'^com.apple(.*:)+', '<*>', foo))

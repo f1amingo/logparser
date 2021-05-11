@@ -11,6 +11,9 @@ import hashlib
 from datetime import datetime
 from .ADC import log_signature
 
+### replace variable with this
+VAR = '<$>'
+
 
 class Logcluster:
     def __init__(self, logTemplate='', logIDL=None):
@@ -77,10 +80,10 @@ class LogParser:
 
             if token in parentn.childD:
                 parentn = parentn.childD[token]
-            elif '<*>' in parentn.childD:
-                parentn = parentn.childD['<*>']
+            elif VAR in parentn.childD:
+                parentn = parentn.childD[VAR]
             else:
-                return -1,None
+                return -1, None
             currentDepth += 1
 
         logClustL = parentn.childD
@@ -119,32 +122,32 @@ class LogParser:
             # If token not matched in this layer of existing tree.
             if token not in parentn.childD:
                 if not self.hasNumbers(token):
-                    if '<*>' in parentn.childD:
+                    if VAR in parentn.childD:
                         if len(parentn.childD) < self.maxChild:
                             newNode = Node(depth=currentDepth + 1, digitOrtoken=token)
                             parentn.childD[token] = newNode
                             parentn = newNode
                         else:
-                            parentn = parentn.childD['<*>']
+                            parentn = parentn.childD[VAR]
                     else:
                         if len(parentn.childD) + 1 < self.maxChild:
                             newNode = Node(depth=currentDepth + 1, digitOrtoken=token)
                             parentn.childD[token] = newNode
                             parentn = newNode
                         elif len(parentn.childD) + 1 == self.maxChild:
-                            newNode = Node(depth=currentDepth + 1, digitOrtoken='<*>')
-                            parentn.childD['<*>'] = newNode
+                            newNode = Node(depth=currentDepth + 1, digitOrtoken=VAR)
+                            parentn.childD[VAR] = newNode
                             parentn = newNode
                         else:
-                            parentn = parentn.childD['<*>']
+                            parentn = parentn.childD[VAR]
 
                 else:
-                    if '<*>' not in parentn.childD:
-                        newNode = Node(depth=currentDepth + 1, digitOrtoken='<*>')
-                        parentn.childD['<*>'] = newNode
+                    if VAR not in parentn.childD:
+                        newNode = Node(depth=currentDepth + 1, digitOrtoken=VAR)
+                        parentn.childD[VAR] = newNode
                         parentn = newNode
                     else:
-                        parentn = parentn.childD['<*>']
+                        parentn = parentn.childD[VAR]
 
             # If the token is matched
             else:
@@ -165,7 +168,7 @@ class LogParser:
         numOfPar = 0
 
         for token1, token2 in zip(seq1, seq2):
-            if token1 == '<*>':
+            if token1 == VAR:
                 numOfPar += 1
                 continue
             if token1 == token2:
@@ -211,7 +214,7 @@ class LogParser:
             if word == seq2[i]:
                 retVal.append(word)
             else:
-                retVal.append('<*>')
+                retVal.append(VAR)
 
             i += 1
 
@@ -336,7 +339,7 @@ class LogParser:
 
     def preprocess(self, line):
         for currentRex in self.rex:
-            line = re.sub(currentRex, '<*>', line)
+            line = re.sub(currentRex, VAR, line)
         return line
 
     def log_to_dataframe(self, log_file, regex, headers, logformat):
@@ -376,11 +379,11 @@ class LogParser:
         return headers, regex
 
     def get_parameter_list(self, row):
-        template_regex = re.sub(r"<.{1,5}>", "<*>", row["EventTemplate"])
-        if "<*>" not in template_regex: return []
+        template_regex = re.sub(r"<.{1,5}>", VAR, row["EventTemplate"])
+        if VAR not in template_regex: return []
         template_regex = re.sub(r'([^A-Za-z0-9])', r'\\\1', template_regex)
         template_regex = re.sub(r'\\ +', r'\s+', template_regex)
-        template_regex = "^" + template_regex.replace("\<\*\>", "(.*?)") + "$"
+        template_regex = "^" + template_regex.replace("\<\$\>", "(.*?)") + "$"
         parameter_list = re.findall(template_regex, row["Content"])
         parameter_list = parameter_list[0] if parameter_list else ()
         parameter_list = list(parameter_list) if isinstance(parameter_list, tuple) else [parameter_list]

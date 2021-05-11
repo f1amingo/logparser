@@ -5,7 +5,7 @@ import logparser.ADC.ADC_Drain as ADC_Drain
 
 # The input directory of log file
 output_dir = 'ADC_Drain_result/'  # The output directory of parsing results
-one_setting = benchmark_settings['Thunderbird']
+one_setting = benchmark_settings['Mac']
 log_file = os.path.basename(one_setting['log_file'])
 input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 

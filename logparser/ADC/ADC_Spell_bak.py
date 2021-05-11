@@ -10,8 +10,7 @@ import re
 import string
 from datetime import datetime
 import pandas as pd
-from .log_signature import calc_signature
-
+from .ADC import log_signature
 
 
 class LCSObject:
@@ -252,7 +251,7 @@ class LogParser:
             logmessageL = list(filter(lambda x: x != '', re.split(r'[\s=:,]', self.preprocess(line['Content']))))
             constLogMessL = [w for w in logmessageL if w != '<*>']
 
-            log_sig = calc_signature(logmessageL)
+            log_sig = log_signature(logmessageL)
             if log_sig not in sig_bins:
                 sig_bins[log_sig] = (Node(), [])
             rootNode, logCluL = sig_bins[log_sig]

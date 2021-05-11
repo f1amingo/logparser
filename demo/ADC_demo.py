@@ -3,7 +3,7 @@ from logparser import ADC
 from benchmark.ADC_benchmark import CONFIG_DICT
 from logparser.utils.dataset import *
 
-dataset = DATASET.Thunderbird
+dataset = DATASET.Proxifier
 parser = ADC.LogParser(
     dataset=dataset,
     rex=CONFIG_DICT[dataset].rex,
