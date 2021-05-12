@@ -4,16 +4,10 @@ from datetime import datetime
 from typing import List
 from logparser.utils.dataset import *
 
-DELIMITERS = {' ', '=', ',', ':', '|', '(', ')', '[', ']'}
+DELIMITERS = {' ', '=', ',', ':', '|', '(', ')', '[', ']', '"'}
 SPLIT_DELIMITER = '([' + ''.join(['\\' + k for k in DELIMITERS]) + '])'
 VAR = '<$>'  # replace variable with
 
-CHAR_LIST = [
-    # '=',
-    # ';',
-    # '"',
-    # '*',
-]
 TOKEN_LIST = []
 
 
@@ -23,15 +17,6 @@ def set_TOKEN_LIST(token_list: list):
     TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
 
 
-# TOKEN_LIST = [
-#     'true',  # Android
-#     'SPP.',  # Windows E35
-#     '\'Active\'',  # Mac E258
-#     'HTTPS',  # Proxifier E1
-#     'with',  # Proxifier E4
-#     'has',
-# ]
-CHAR_DICT = {k: 0 for k in CHAR_LIST}
 TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
 
 
@@ -48,17 +33,13 @@ def log_split(log_content: str) -> List[str]:
 
 
 def log_signature(token_list: List[str]) -> int:
-    char_dict = CHAR_DICT.copy()  # char-level feature
     token_dict = TOKEN_DICT.copy()  # token-level feature
+    base = 0
 
     for token in token_list:
-        for ch in token:
-            if ch in char_dict:
-                char_dict[ch] += 1
         if token in TOKEN_DICT:
             token_dict[token] += 1
 
-    base = dict2Int(char_dict, 0)
     base = dict2Int(token_dict, base)
     # base = base * 100 + len(token_list)  # length feature
     return base
@@ -110,7 +91,7 @@ class LogParser:
                 updated_template = self.new_template_from(log_token_list, template_token_list)
                 self.update_template(log_cluster, updated_template, template_idx)
             this_eventId = log_sig * 1000 + template_idx
-            eventId_list.append(this_eventId)
+            eventId_list.append(str(this_eventId))
 
         self.dump_result(eventId_list)
 
@@ -125,41 +106,28 @@ class LogParser:
         return line
 
     def search(self, log_cluster: LogCluster, token_list: List[str]) -> (int, List[str]):
-        def log_sim(token_list1: list, token_list2: list) -> (float, float):
+        def log_sim(token_list1: list, token_list2: list) -> float:
             m, n = len(token_list1), len(token_list2)
-            if m != n:
-                return 0, 0
-            # 利用前缀信息
-            for i in range(min(self.pre, n)):
-                if token_list1[i] != token_list2[i]:
-                    return 0, 0
-            count = self.pre
-            for i in range(self.pre, n):
-                # if token_list1[i] == VAR or token_list2[i] == VAR or token_list1[i] == token_list2[i]:
-                #     count += 1
-                # 符号否决
-                isDel1 = token_list1[i] in DELIMITERS
-                isDel2 = token_list2[i] in DELIMITERS
-                if not isDel1 and not isDel2:
-                    if token_list1[i] == VAR or token_list2[i] == VAR or token_list1[i] == token_list2[
-                        i]:
-                        count += 1
-                elif isDel1 or isDel2:
-                    if token_list1[i] == token_list2[i]:
-                        count += 1
-                    else:
-                        return 0, 0
-            return count / m, 0
+            if m < n:
+                # make sure token_list1 longer than token_list2
+                token_list1, token_list2 = token_list2, token_list1
+                m, n = n, m
+
+            count = 0
+            for i in range(0, n):
+                if token_list1[i] == VAR or token_list2[i] == VAR or token_list1[i] == token_list2[i]:
+                    count += 1
+            return count / n
 
         max_score = 0
         max_idx = -1
         for i, template in enumerate(log_cluster.template_list):
-            score, _ = log_sim(template, token_list)
+            score = log_sim(template, token_list)
             if score > max_score:
                 max_idx = i
                 max_score = score
 
-        if max_score > self.st:
+        if max_score > 0.5:
             return max_idx, log_cluster.template_list[max_idx]
         return -1, None
 
@@ -168,14 +136,13 @@ class LogParser:
         return len(log_cluster.template_list) - 1
 
     def new_template_from(self, log_token_list: List[str], template_token_list: List[str]) -> List[str]:
-        assert len(log_token_list) == len(template_token_list)
-        new_token_list = []
-        for t1, t2 in zip(log_token_list, template_token_list):
-            if t1 == t2:
-                new_token_list.append(t1)
-            else:
-                new_token_list.append(VAR)
-        return new_token_list
+        # new_token_list = []
+        # for t1, t2 in zip(log_token_list, template_token_list):
+        #     if t1 == t2:
+        #         new_token_list.append(t1)
+        #     else:
+        #         new_token_list.append(VAR)
+        return template_token_list
 
     def update_template(self, log_cluster: LogCluster, token_list: List[str], idx: int):
         log_cluster.template_list[idx] = token_list

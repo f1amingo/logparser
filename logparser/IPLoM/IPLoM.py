@@ -14,9 +14,11 @@ import pandas as pd
 import hashlib
 import string
 
+
 class Partition:
     """ Wrap around the logs and the step number
     """
+
     def __init__(self, stepNo, numOfLogs=0, lenOfLogs=0):
         self.logLL = []
         self.stepNo = stepNo
@@ -60,13 +62,15 @@ class Para:
         self.rex = rex
         self.logformat = log_format
 
+
 class LogParser:
     def __init__(self, log_format, indir='../logs/', outdir='./result/',
                  maxEventLen=200, step2Support=0, PST=0,
                  CT=0.35, lowerBound=0.25, upperBound=0.9,
                  rex=[], keep_para=True):
 
-        self.para = Para(log_format=log_format, indir=indir, outdir=outdir, maxEventLen=maxEventLen, step2Support=step2Support,
+        self.para = Para(log_format=log_format, indir=indir, outdir=outdir, maxEventLen=maxEventLen,
+                         step2Support=step2Support,
                          PST=PST, CT=CT, lowerBound=lowerBound, upperBound=upperBound, rex=rex)
         self.partitionsL = []
         self.eventsL = []
@@ -94,7 +98,8 @@ class LogParser:
 
     def Step1(self):
         headers, regex = self.generate_logformat_regex(self.para.logformat)
-        self.df_log = self.log_to_dataframe(os.path.join(self.para.path, self.logname), regex, headers, self.para.logformat)
+        self.df_log = self.log_to_dataframe(os.path.join(self.para.path, self.logname), regex, headers,
+                                            self.para.logformat)
         lineCount = 1
         for idx, line in self.df_log.iterrows():
             line = line['Content']
@@ -212,7 +217,7 @@ class LogParser:
                     p2Set.add(logL[p2])
 
                     if (logL[p1] == logL[p2]):
-                        print ("Warning: p1 may be equal to p2")
+                        print("Warning: p1 may be equal to p2")
 
                     if logL[p1] not in mapRelation1DS:
                         mapRelation1DS[logL[p1]] = set()
@@ -280,8 +285,8 @@ class LogParser:
                         oneToMP2D[logL[p2]] += 1
 
             except KeyError as er:
-                print (er)
-                print ('error: ' + str(p1) + '\t' + str(p2))
+                print(er)
+                print('error: ' + str(p1) + '\t' + str(p2))
 
             newPartitionsD = {}
             if partition.stepNo == 2:
@@ -372,7 +377,7 @@ class LogParser:
                 continue
 
             if partition.numOfLogs == 0:
-                print (str(partition.stepNo) + '\t')
+                print(str(partition.stepNo) + '\t')
 
             uniqueTokensCountLS = []
             for columnIdx in range(partition.lenOfLogs):
@@ -402,6 +407,7 @@ class LogParser:
         if self.para.PST == 0 and self.partitionsL[0].numOfLogs != 0:
             for logL in self.partitionsL[0].logLL:
                 self.output.append(logL[-2:] + logL[:-2])
+        i = 0
         for partition in self.partitionsL:
             if not partition.valid:
                 continue
@@ -409,7 +415,7 @@ class LogParser:
                 self.output.append(logL[-2:] + logL[:-2])
 
     def WriteEventToFile(self):
-        eventID_template = {event.eventId : ' '.join(event.eventStr) for event in self.eventsL}
+        eventID_template = {event.eventId: ' '.join(event.eventStr) for event in self.eventsL}
         eventList = [[event.eventId, ' '.join(event.eventStr), event.eventCount] for event in self.eventsL]
         eventDf = pd.DataFrame(eventList, columns=['EventId', 'EventTemplate', 'Occurrences'])
         eventDf.to_csv(os.path.join(self.para.savePath, self.logname + '_templates.csv'), index=False)
@@ -417,8 +423,8 @@ class LogParser:
         self.output.sort(key=lambda x: int(x[0]))
         self.df_log['EventId'] = [str(logL[1]) for logL in self.output]
         self.df_log['EventTemplate'] = [eventID_template[logL[1]] for logL in self.output]
-        if self.keep_para:
-            self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1) 
+        # if self.keep_para:
+        #     self.df_log["ParameterList"] = self.df_log.apply(self.get_parameter_list, axis=1)
         self.df_log.to_csv(os.path.join(self.para.savePath, self.logname + '_structured.csv'), index=False)
 
     """
@@ -433,8 +439,8 @@ class LogParser:
         try:
             distance = 1.0 * cardOfS / Lines_that_match_S
         except ZeroDivisionError as er1:
-            print (er1)
-            print ("cardOfS: " + str(cardOfS) + '\t' + 'Lines_that_match_S: ' + str(Lines_that_match_S))
+            print(er1)
+            print("cardOfS: " + str(cardOfS) + '\t' + 'Lines_that_match_S: ' + str(Lines_that_match_S))
 
         if distance <= self.para.lowerBound:
             if one_m:
@@ -522,12 +528,12 @@ class LogParser:
                             p2 = columnIdx
                             break
 
-#                 for columnIdx in range(partition.lenOfLogs):
-#                     if p2 != -1:
-#                         break
-#                     if numOfUniqueTokensD[len(uniqueTokensCountLS[columnIdx])] == secondMaxCount:
-#                         p2 = columnIdx
-#                         break
+            #                 for columnIdx in range(partition.lenOfLogs):
+            #                     if p2 != -1:
+            #                         break
+            #                     if numOfUniqueTokensD[len(uniqueTokensCountLS[columnIdx])] == secondMaxCount:
+            #                         p2 = columnIdx
+            #                         break
 
             # If the frequency of the freq_card==1 then
             else:
@@ -575,17 +581,17 @@ class LogParser:
 
     def PrintPartitions(self):
         for idx in range(len(self.partitionsL)):
-            print ('Partition {}:(from step {})    Valid:{}'.format(idx, self.partitionsL[idx].stepNo,
-                                                                    self.partitionsL[idx].valid))
+            print('Partition {}:(from step {})    Valid:{}'.format(idx, self.partitionsL[idx].stepNo,
+                                                                   self.partitionsL[idx].valid))
 
             for log in self.partitionsL[idx].logLL:
-                print (log)
+                print(log)
 
     def PrintEventStats(self):
         for event in self.eventsL:
             if event.eventCount > 1:
-                print (str(event.eventId) + '\t' + str(event.eventCount))
-                print (event.eventStr)
+                print(str(event.eventId) + '\t' + str(event.eventCount))
+                print(event.eventStr)
 
     def log_to_dataframe(self, log_file, regex, headers, logformat):
         """ Function to transform log file to dataframe 

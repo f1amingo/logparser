@@ -8,7 +8,8 @@ import json
 import numpy as np
 from sklearn.metrics import accuracy_score
 from sklearn.metrics.pairwise import cosine_similarity
-import template
+from logparser.LenMa.templateminer import template
+
 
 class LenmaTemplate(template.Template):
     def __init__(self, index=None, words=None, logid=None, json=None):
@@ -17,8 +18,8 @@ class LenmaTemplate(template.Template):
             self._restore_from_json(json)
         else:
             # initialize with the specified index and words vlaues.
-            assert(index is not None)
-            assert(words is not None)
+            assert (index is not None)
+            assert (words is not None)
             self._index = index
             self._words = words
             self._nwords = len(words)
@@ -93,7 +94,7 @@ class LenmaTemplate(template.Template):
 
         # check exact match
         ac_score = self._get_accuracy_score(new_words)
-        if  ac_score == 1:
+        if ac_score == 1:
             return 1
 
         cos_score = self._get_similarity_score_cosine(new_words)
@@ -129,8 +130,8 @@ class LenmaTemplate(template.Template):
 
     def update(self, new_words, logid):
         self._counts += 1
-        self._wordlens = [len(w) for w in new_words] 
-        #self._wordlens = [(self._wordlens[idx] + len(new_words[idx])) / 2
+        self._wordlens = [len(w) for w in new_words]
+        # self._wordlens = [(self._wordlens[idx] + len(new_words[idx])) / 2
         #                  for idx in range(self.nwords)]
         self._words = [self.words[idx] if self._words[idx] == new_words[idx]
                        else '' for idx in range(self.nwords)]
@@ -145,6 +146,7 @@ class LenmaTemplate(template.Template):
 
     def get_logids(self):
         return self._logid
+
 
 class LenmaTemplateManager(template.TemplateManager):
     def __init__(self,
@@ -175,9 +177,9 @@ class LenmaTemplateManager(template.TemplateManager):
             candidates.append((index, score))
         candidates.sort(key=lambda c: c[1], reverse=True)
         if False:
-            for (i,s) in candidates:
+            for (i, s) in candidates:
                 print('    ', s, self.templates[i])
-        
+
         if len(candidates) > 0:
             index = candidates[0][0]
             self.templates[index].update(words, logid)
@@ -186,6 +188,7 @@ class LenmaTemplateManager(template.TemplateManager):
         new_template = self._append_template(
             LenmaTemplate(len(self.templates), words, logid))
         return new_template
+
 
 if __name__ == '__main__':
     import datetime

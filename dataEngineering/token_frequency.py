@@ -1,6 +1,6 @@
 import pandas as pd
 import collections
-from logparser.utils.logdata import *
+from logparser.utils.dataset import *
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -8,7 +8,7 @@ dataset_list = []
 top_list = []
 last_list = []
 for dataset in DATASET:
-    df = pd.read_csv(path_structured(dataset))
+    df = pd.read_csv(log_path_structured(dataset))
     counter = collections.defaultdict(int)
     for idx, row in df.iterrows():
         split_list = row['Content'].log_split()

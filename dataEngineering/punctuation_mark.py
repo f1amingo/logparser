@@ -8,7 +8,7 @@
 import pandas as pd
 from logparser.utils.dataset import *
 
-sign = '*'
+sign = '='
 if __name__ == '__main__':
     result_dict = {
         'eventId': [],
@@ -17,11 +17,11 @@ if __name__ == '__main__':
     }
     for dataset in DATASET:
         print(dataset)
-        if dataset != DATASET.BGL:
-            continue
+        # if dataset != DATASET.BGL:
+        #     continue
         df = pd.read_csv(log_path_structured(dataset))
         # 去重
-        # df.drop_duplicates(subset=['EventId'], keep='first', inplace=True)
+        df.drop_duplicates(subset=['EventId'], keep='first', inplace=True)
         for idx, row in df.iterrows():
             content = row['Content']
             eventId = row['EventId']

@@ -1,9 +1,14 @@
 from logparser import evaluator
 from logparser import ADC
+from logparser.ADC import ADC_Token as ADC
 from benchmark.ADC_benchmark import CONFIG_DICT
 from logparser.utils.dataset import *
+from dataEngineering.token_selection import get_token_list
 
 dataset = DATASET.Proxifier
+
+ADC.set_TOKEN_LIST(get_token_list(dataset))
+
 parser = ADC.LogParser(
     dataset=dataset,
     rex=CONFIG_DICT[dataset].rex,
