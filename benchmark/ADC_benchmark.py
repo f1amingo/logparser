@@ -1,7 +1,7 @@
 import collections
 from logparser import evaluator
 from logparser.ADC import ADC
-from logparser.ADC import ADC_Token as ADC
+# from logparser.ADC import ADC_Token as ADC
 from logparser.utils.dataset import *
 from dataEngineering.token_selection import get_token_list
 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         print('\n=== Evaluation on %s ===' % dataset)
 
         # get the token list
-        ADC.set_TOKEN_LIST(get_token_list(dataset))
+        # ADC.set_TOKEN_LIST(get_token_list(dataset))
 
         parser = ADC.LogParser(
             dataset=dataset,

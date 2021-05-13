@@ -4,17 +4,26 @@ from datetime import datetime
 from typing import List
 from logparser.utils.dataset import *
 
-DELIMITERS = {' ', '=', ',', ':', '|', '(', ')', '[', ']'}
+DELIMITERS = {' ', '=', ',', ':', '|', '(', ')', '[', ']', '\'', }
 SPLIT_DELIMITER = '([' + ''.join(['\\' + k for k in DELIMITERS]) + '])'
 VAR = '<$>'  # replace variable with
 
 CHAR_LIST = [
-    # '=',
-    # ';',
-    # '"',
-    # '*',
+    '=',
+    ';',
+    '"',
+    '*',
 ]
-TOKEN_LIST = []
+TOKEN_LIST = [
+    'true',  # Android
+    'SPP.',  # Windows E35
+    # '\'Active\'',  # Mac E258
+    'Active',  # Mac E258
+    'HTTPS',  # Proxifier E1
+    'with',  # Proxifier E4
+    'has',  # BGL
+    # 'guest',  # Linux E17 conflict with OpenSSH
+]
 
 
 def set_TOKEN_LIST(token_list: list):
@@ -23,14 +32,6 @@ def set_TOKEN_LIST(token_list: list):
     TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
 
 
-# TOKEN_LIST = [
-#     'true',  # Android
-#     'SPP.',  # Windows E35
-#     '\'Active\'',  # Mac E258
-#     'HTTPS',  # Proxifier E1
-#     'with',  # Proxifier E4
-#     'has',
-# ]
 CHAR_DICT = {k: 0 for k in CHAR_LIST}
 TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
 
@@ -60,7 +61,7 @@ def log_signature(token_list: List[str]) -> int:
 
     base = dict2Int(char_dict, 0)
     base = dict2Int(token_dict, base)
-    # base = base * 100 + len(token_list)  # length feature
+    base = base * 100 + len(token_list)  # length feature
     return base
 
 
