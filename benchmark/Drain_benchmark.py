@@ -2,7 +2,8 @@ import pandas as pd
 import os
 from logparser import evaluator
 from logparser import Drain
-from logparser.ADC import ADC_Drain as Drain
+
+# from logparser.ADC import ADC_Drain as Drain
 
 input_dir = '../logs/'  # The input directory of log file
 output_dir = 'Drain_result/'  # The output directory of parsing results
@@ -145,18 +146,28 @@ if __name__ == '__main__':
         indir = os.path.join(input_dir, os.path.dirname(setting['log_file']))
         log_file = os.path.basename(setting['log_file'])
 
-        parser = Drain.LogParser(log_format=setting['log_format'], indir=indir, outdir=output_dir, rex=setting['regex'],
-                                 depth=setting['depth'], st=setting['st'])
-        parser.parse(log_file)
+        parser = Drain.LogParser(
+            log_format=setting['log_format'],
+            indir=indir,
+            outdir=output_dir,
+            rex=setting['regex'],
+            depth=setting['depth'],
+            st=setting['st'],
+            keep_para=False
+        )
+
+        time_elapsed = parser.parse(log_file)
 
         F1_measure, accuracy = evaluator.evaluate(
             groundtruth=os.path.join(indir, log_file + '_structured.csv'),
             parsedresult=os.path.join(output_dir, log_file + '_structured.csv')
         )
-        bechmark_result.append([dataset, F1_measure, accuracy])
+        bechmark_result.append([dataset, F1_measure, accuracy, time_elapsed.total_seconds()])
 
     print('\n=== Overall evaluation results ===')
-    df_result = pd.DataFrame(bechmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
+    df_result = pd.DataFrame(bechmark_result, columns=['Dataset', 'F1_measure', 'Accuracy', 'Time'])
     df_result.set_index('Dataset', inplace=True)
     print(df_result)
-    df_result.T.to_csv('Drain_bechmark_result.csv')
+    df_result.T.to_csv('Drain_benchmark_result.csv')
+
+    print('\t'.join(list(map(str, list(df_result['Time'])))))

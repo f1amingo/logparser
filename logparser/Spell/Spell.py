@@ -43,7 +43,7 @@ class LogParser:
         tau : how much percentage of tokens matched to merge a log message
     """
 
-    def __init__(self, indir='./', outdir='./result/', log_format=None, tau=0.5, rex=[], keep_para=True):
+    def __init__(self, indir='./', outdir='./result/', log_format=None, tau=0.5, rex=[], keep_para=False):
         self.path = indir
         self.logName = None
         self.savePath = outdir
@@ -266,7 +266,9 @@ class LogParser:
             os.makedirs(self.savePath)
 
         self.outputResult(logCluL)
-        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - starttime))
+        time_elapsed = datetime.now() - starttime
+        print('Parsing done. [Time taken: {!s}]'.format(time_elapsed))
+        return time_elapsed
 
     def load_data(self):
         headers, regex = self.generate_logformat_regex(self.logformat)

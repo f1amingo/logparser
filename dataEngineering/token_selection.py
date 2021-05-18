@@ -47,7 +47,7 @@ def get_token_list(dataset: DATASET) -> list:
         content = simplify_content(content)
         content_token_list = re.split('\W+', content)
         for token in content_token_list:
-            if re.fullmatch('([a-zA-Z\*\.-]{2,})', token):
+            if re.fullmatch('([a-zA-Z*.-]{2,})', token):
                 token_counter[token] += 1
     black_list = BLACK_LIST[dataset]
     # token_list = [t for t in token_counter if token_counter[t] > 1 and t not in black_list]
@@ -58,7 +58,7 @@ def get_token_list(dataset: DATASET) -> list:
 
 
 if __name__ == '__main__':
-    res = get_token_list(DATASET.Proxifier)
+    res = get_token_list(DATASET.Android)
     print(res)
 
     # result_dict = collections.defaultdict(list)

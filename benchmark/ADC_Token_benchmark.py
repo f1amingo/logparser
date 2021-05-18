@@ -1,7 +1,6 @@
 import collections
 from logparser import evaluator
-from logparser.ADC import ADC
-# from logparser.ADC import ADC_Token as ADC
+from logparser.ADC import ADC_Token
 from logparser.utils.dataset import *
 from dataEngineering.token_selection import get_token_list
 
@@ -14,13 +13,8 @@ class ADCConfig:
 
 
 CONFIG_DICT = collections.defaultdict(ADCConfig)
-CONFIG_DICT[DATASET.Android].rex = [
-    r'".*"',
-    # r'(/[\w-]+)+',
-    r'([\w-]+\.){2,}[\w-]+',
-    r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'
-]
-CONFIG_DICT[DATASET.Android].pre = 9
+CONFIG_DICT[DATASET.Android].rex = [r'".*"']
+CONFIG_DICT[DATASET.Android].pre = 3
 CONFIG_DICT[DATASET.Apache]
 CONFIG_DICT[DATASET.BGL].rex = [r'\d+']
 CONFIG_DICT[DATASET.BGL].st = 0.7
@@ -42,8 +36,6 @@ CONFIG_DICT[DATASET.Spark].st = 0.7
 # CONFIG_DICT[DATASET.Thunderbird].st = 0.8
 CONFIG_DICT[DATASET.Thunderbird].rex = [r'LOCAL\(0\)']
 CONFIG_DICT[DATASET.Windows].st = 0.8
-CONFIG_DICT[DATASET.Windows].pre = 0
-# CONFIG_DICT[DATASET.Windows].rex = [r'0x.*?\s']
 CONFIG_DICT[DATASET.Zookeeper]
 
 if __name__ == '__main__':
@@ -53,28 +45,27 @@ if __name__ == '__main__':
         print('\n=== Evaluation on %s ===' % dataset)
 
         # get the token list
-        # ADC.set_TOKEN_LIST(get_token_list(dataset))
+        ADC_Token.set_TOKEN_LIST(get_token_list(dataset))
 
-        parser = ADC.LogParser(
+        parser = ADC_Token.LogParser(
             dataset=dataset,
             rex=CONFIG_DICT[dataset].rex,
             st=CONFIG_DICT[dataset].st,
             pre=CONFIG_DICT[dataset].pre,
         )
 
-        time_elapsed, out_path = parser.parse()
+        out_path = parser.parse()
 
         F1_measure, accuracy = evaluator.evaluate(
             groundtruth=log_path_structured(dataset),
             parsedresult=out_path
         )
-        benchmark_result.append([dataset, F1_measure, accuracy, time_elapsed.total_seconds()])
+        benchmark_result.append([dataset, F1_measure, accuracy])
 
     print('\n=== Overall evaluation results ===')
-    df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy', 'Time'])
+    df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
     df_result.set_index('Dataset', inplace=True)
     print(df_result)
     accuracy_list = list(map(str, list(df_result['Accuracy'])))
     print('\t'.join(accuracy_list))
-    print('\t'.join(list(map(str, list(df_result['Time'])))))
-    df_result.T.to_csv('ADC_benchmark_result.csv')
+    df_result.T.to_csv('ADC_Token_benchmark_result.csv')

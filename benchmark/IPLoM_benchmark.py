@@ -146,18 +146,25 @@ for dataset, setting in benchmark_settings.items():
     indir = os.path.join(input_dir, os.path.dirname(setting['log_file']))
     log_file = os.path.basename(setting['log_file'])
 
-    parser = IPLoM.LogParser(log_format=setting['log_format'], indir=indir, outdir=output_dir,
-                             CT=setting['CT'], lowerBound=setting['lowerBound'], rex=setting['regex'])
-    parser.parse(log_file)
+    parser = IPLoM.LogParser(
+        log_format=setting['log_format'],
+        indir=indir,
+        outdir=output_dir,
+        CT=setting['CT'],
+        lowerBound=setting['lowerBound'],
+        rex=setting['regex'],
+        keep_para=False
+    )
+    time_elapsed = parser.parse(log_file)
 
     F1_measure, accuracy = evaluator.evaluate(
         groundtruth=os.path.join(indir, log_file + '_structured.csv'),
         parsedresult=os.path.join(output_dir, log_file + '_structured.csv')
     )
-    benchmark_result.append([dataset, F1_measure, accuracy])
+    benchmark_result.append([dataset, F1_measure, accuracy, time_elapsed.total_seconds()])
 
 print('\n=== Overall evaluation results ===')
-df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
+df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy', 'Time'])
 df_result.set_index('Dataset', inplace=True)
 print(df_result)
 
@@ -165,3 +172,5 @@ accuracy_list = list(map(str, list(df_result['Accuracy'])))
 print('\t'.join(accuracy_list))
 
 df_result.T.to_csv('IPLoM_benchmark_result.csv')
+
+print('\t'.join(list(map(str, list(df_result['Time'])))))

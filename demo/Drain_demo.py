@@ -4,7 +4,7 @@ from benchmark.Drain_benchmark import benchmark_settings
 from logparser import Drain
 
 output_dir = 'Drain_result/'  # The output directory of parsing results
-one_setting = benchmark_settings['Android']
+one_setting = benchmark_settings['HDFS']
 log_file = os.path.basename(one_setting['log_file'])
 input_dir = os.path.join('../logs/', os.path.dirname(one_setting['log_file']))
 
@@ -16,11 +16,11 @@ parser = Drain.LogParser(
     st=one_setting['st'],
     rex=one_setting['regex']
 )
-parser.parse(log_file)
+time_elapsed = parser.parse(log_file)
 
 F1_measure, accuracy = evaluator.evaluate(
     groundtruth=os.path.join(input_dir, log_file + '_structured.csv'),
     parsedresult=os.path.join(output_dir, log_file + '_structured.csv'),
 )
 
-print(F1_measure, accuracy)
+print(F1_measure, accuracy, time_elapsed.total_seconds())

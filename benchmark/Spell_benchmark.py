@@ -126,20 +126,28 @@ if __name__ == '__main__':
         indir = os.path.join(input_dir, os.path.dirname(setting['log_file']))
         log_file = os.path.basename(setting['log_file'])
 
-        parser = Spell.LogParser(log_format=setting['log_format'], indir=indir,
-                                 outdir=output_dir, rex=setting['regex'], tau=setting['tau'])
-        parser.parse(log_file)
+        parser = Spell.LogParser(
+            log_format=setting['log_format'],
+            indir=indir,
+            outdir=output_dir,
+            rex=setting['regex'],
+            tau=setting['tau'],
+            keep_para=False
+        )
+        time_elapsed = parser.parse(log_file)
 
         F1_measure, accuracy = evaluator.evaluate(
             groundtruth=os.path.join(indir, log_file + '_structured.csv'),
             parsedresult=os.path.join(output_dir, log_file + '_structured.csv')
         )
-        bechmark_result.append([dataset, F1_measure, accuracy])
+        bechmark_result.append([dataset, F1_measure, accuracy, time_elapsed.total_seconds()])
 
     print('\n=== Overall evaluation results ===')
-    df_result = pd.DataFrame(bechmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
+    df_result = pd.DataFrame(bechmark_result, columns=['Dataset', 'F1_measure', 'Accuracy', 'Time'])
     df_result.set_index('Dataset', inplace=True)
     print(df_result)
     accuracy_list = list(map(str, list(df_result['Accuracy'])))
     print('\t'.join(accuracy_list))
     df_result.T.to_csv('Spell_benchmark_result.csv')
+
+    print('\t'.join(list(map(str, list(df_result['Time'])))))
