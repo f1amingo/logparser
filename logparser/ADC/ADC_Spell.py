@@ -11,8 +11,10 @@ import string
 from datetime import datetime
 import pandas as pd
 from .ADC import log_signature
+from .ADC_New import log_signature, log_split
 
 VAR = '<$>'
+
 
 class LCSObject:
     """ Class object to store a log group with the same template
@@ -254,11 +256,14 @@ class LogParser:
         # count = 0
         for idx, line in self.df_log.iterrows():
             logID = line['LineId']
-            logmessageL = list(filter(lambda x: x != '', re.split(r'[\s=:,]', self.preprocess(line['Content']))))
+            ### for linux
+            log_content = re.sub('\s+', ' ', line['Content']).strip()
+            log_content = self.preprocess(log_content).strip()
+            logmessageL = list(filter(lambda x: x != '', re.split(r'[\s=:,]', log_content)))
             constLogMessL = [w for w in logmessageL if w != VAR]
 
             ### calc log signature
-            log_sig = log_signature(logmessageL)
+            log_sig = log_signature(log_content, [])
             if log_sig not in bin_dict:
                 bin_dict[log_sig] = (Node(), [])
             rootNode, logCluL = bin_dict[log_sig]

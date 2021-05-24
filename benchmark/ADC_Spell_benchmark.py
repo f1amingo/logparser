@@ -80,7 +80,7 @@ benchmark_settings = {
     'OpenStack': {
         'log_file': 'OpenStack/OpenStack_2k.log',
         'log_format': '<Logrecord> <Date> <Time> <Pid> <Level> <Component> \[<ADDR>\] <Content>',
-        'regex': [r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
+        'regex': [r'/.*"', r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
         'tau': 0.9
     },
 
@@ -101,7 +101,7 @@ benchmark_settings = {
     'Thunderbird': {
         'log_file': 'Thunderbird/Thunderbird_2k.log',
         'log_format': '<Label> <Timestamp> <Date> <User> <Month> <Day> <Time> <Location> <Component>(\[<PID>\])?: <Content>',
-        'regex': [r'(\d+\.){3}\d+'],
+        'regex': [r'(\d+\.){3}\d+', r'LOCAL\(0\)'],
         'tau': 0.5
     },
 

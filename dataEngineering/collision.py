@@ -7,6 +7,7 @@ import numpy as np
 from logparser.utils.dataset import *
 import collections
 from logparser.ADC import log_signature, log_split
+from logparser.ADC.ADC_New import log_signature, log_split
 
 
 class BinEntry:
@@ -28,7 +29,7 @@ if __name__ == '__main__':
         for idx, row in df.iterrows():
             log_content = row['Content']
             log_token_list = log_split(log_content)
-            log_sig = log_signature(log_token_list)
+            log_sig = log_signature(log_token_list, log_token_list)
             bin_dict[log_sig].sig = log_sig
             bin_dict[log_sig].templates.append(log_content)
         count_list = [len(bin_dict[k].templates) for k in bin_dict]

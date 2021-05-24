@@ -43,18 +43,18 @@ benchmark_settings = {
         'threshold': 0.9
     },
 
-    'HPC': {
-        'log_file': 'HPC/HPC_2k.log',
-        'log_format': '<LogId> <Node> <Component> <State> <Time> <Flag> <Content>',
-        'regex': [r'=\d+'],
-        'threshold': 0.8
-    },
-
     'HealthApp': {
         'log_file': 'HealthApp/HealthApp_2k.log',
         'log_format': '<Time>\|<Component>\|<Pid>\|<Content>',
         'regex': [],
         'threshold': 0.5
+    },
+
+    'HPC': {
+        'log_file': 'HPC/HPC_2k.log',
+        'log_format': '<LogId> <Node> <Component> <State> <Time> <Flag> <Content>',
+        'regex': [r'=\d+'],
+        'threshold': 0.8
     },
 
     'Linux': {

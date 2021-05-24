@@ -90,7 +90,8 @@ benchmark_settings = {
     'OpenStack': {
         'log_file': 'OpenStack/OpenStack_2k.log',
         'log_format': '<Logrecord> <Date> <Time> <Pid> <Level> <Component> \[<ADDR>\] <Content>',
-        'regex': [r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
+        # 'regex': [r'/.*"', r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
+        'regex': [r'/.*"', r'((\d+\.){3}\d+,?)+', r'/.+?\s', r'\d+'],
         'st': 0.5,
         'depth': 5
     },
@@ -123,7 +124,7 @@ benchmark_settings = {
         'log_file': 'Windows/Windows_2k.log',
         'log_format': '<Date> <Time>, <Level>                  <Component>    <Content>',
         'regex': [r'0x.*?\s'],
-        'st': 0.6,
+        'st': 0.7,
         'depth': 5
     },
 

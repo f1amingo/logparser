@@ -10,6 +10,7 @@ import pandas as pd
 import hashlib
 from datetime import datetime
 from .ADC import log_signature
+from .ADC_New import log_signature, log_split
 
 ### replace variable with this
 VAR = '<$>'
@@ -292,10 +293,12 @@ class LogParser:
         count = 0
         for idx, line in self.df_log.iterrows():
             logID = line['LineId']
-            logmessageL = self.preprocess(line['Content']).strip().split()
-            # logmessageL = filter(lambda x: x != '', re.split('[\s=:,]', self.preprocess(line['Content'])))
+            ### for linux
+            log_content = re.sub('\s+', ' ', line['Content']).strip()
+            log_content = self.preprocess(log_content).strip()
+            logmessageL = log_content.split()
             ### calculate log signature
-            log_sig = log_signature(logmessageL)
+            log_sig = log_signature(log_content, log_split(log_content))
             ### get the root node for log_sig
             this_root = bin_dict[log_sig]
             # matchCluster = self.treeSearch(rootNode, logmessageL)

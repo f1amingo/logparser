@@ -4,81 +4,57 @@ from datetime import datetime
 from typing import List
 from logparser.utils.dataset import *
 
-DELIMITERS = {' ', '=', ',', ':', '|', '(', ')', '[', ']', '\'', }
-SPLIT_DELIMITER = '([' + ''.join(['\\' + k for k in DELIMITERS]) + '])'
-delimiter = re.compile(SPLIT_DELIMITER)
+DELIMITER = re.compile('([\s=,:;|()\[\]])')
 VAR = '<$>'  # replace variable with
 
-CHAR_LIST = [
-    '=',
-    ';',
-    '"',
-    '*',
-    ',',
+CHAR_DICT = [
     '|',
+    '"',
     '(',
-    # ')',
-    '[',
-    # ']',
-]
-
-TOKEN_LIST = [
-    # 'false',  # Android
-    # 'true',  # Android
-    # 'SPP.',  # Windows E35
-    # 'Active',  # Mac E258
-    # 'HTTPS',  # Proxifier E1
-    # 'with',  # Proxifier E4
-    # 'has',  # BGL
-    # # 'guest',  # Linux E17 conflict with OpenSSH
+    '*',
+    ';',
+    ',',
+    '=',
+    ':',
+    ' ',
 ]
 
 
-def set_TOKEN_LIST(token_list: list):
-    global TOKEN_LIST, TOKEN_DICT
-    TOKEN_LIST = token_list
-    TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
+def hasNumbers(s):
+    return any(ch.isdigit() for ch in s)
 
 
-CHAR_DICT = {k: 0 for k in CHAR_LIST}
-TOKEN_DICT = {k: 0 for k in TOKEN_LIST}
-
-
-def dict2Int(dic: dict, base: int = 0) -> int:
-    for v in dic.values():
-        digit = 0 if v == 0 else 1
-        base = 2 * base + digit
-    return base
-
-
-def log_split(log_content: str) -> List[str]:
-    # return re.split('([ =,:()\[\]])', log_content)
-    # return re.split(SPLIT_DELIMITER, log_content)
-    return delimiter.split(log_content)
-
-
-# def log_signature(seq_list: List[str], seq: str) -> int:
-#     base = 0
-#     for ch in CHAR_LIST:
-#         base = base * 100 + seq.count(ch)
-#     # base = base * 100 + len(seq_list)  # length feature
-#     base = base * 10 + len(seq_list[0])
-#     return base
-
-
-def log_signature(token_list: List[str]) -> int:
+def log_signature(content: str, log_token_list) -> int:
     base = 0
-    char_dict = CHAR_DICT.copy()  # char-level feature
+    for ch in CHAR_DICT:
+        base = base * 100 + content.count(ch)
+    # word_list1 = [w for w in log_token_list if w not in CHAR_DICT]
+    # len_list = [len(token) for token in word_list1 if not hasNumbers(token)]
+    # max_len = max(len_list) if len_list else 0
+    # 首个token
+    # base = base * 100 + len(log_token_list[0])
 
-    for token in token_list:
-        for ch in token:
-            if ch in char_dict:
-                char_dict[ch] += 1
-
-    base = dict2Int(char_dict, base)
-    base = base * 100 + len(token_list)  # length feature
-    base = base * 10 + len(token_list[0])
+    # 找到第一个不含数字
+    # head = 0
+    # for token in log_token_list:
+    #     if all(ch.isalpha() for ch in token):
+    #         head = len(token)
+    #         break
+    # tail = 0
+    # count = 2
+    # for token in log_token_list[::-1]:
+    #     if all(ch.isalpha() for ch in token):
+    #         tail = len(token)
+    #         count -= 1
+    #         if count == 0:
+    #             break
+    # base = base * 100 + head
+    # base = base * 100 + tail
     return base
+
+
+def log_split(log_content: str):
+    return DELIMITER.split(log_content)
 
 
 class LogCluster:
@@ -99,14 +75,13 @@ class LogParser:
             self.out_path = kwargs['out_path']
         else:
             # default out path
-            self.out_path = os.path.join('ADC_result', self.dataset.value + '_structured.csv')
+            self.out_path = os.path.join('ADC_New_result', self.dataset.value + '_structured.csv')
 
-        self.rex = kwargs['rex']
+        self.rex = [re.compile(r) for r in kwargs['rex']]
         self.st = kwargs['st']
         self.pre = kwargs['pre']
         self.keep_para = kwargs.get('keep_para', False)
 
-        self.log_name = None
         self.df_log = None
         self.log_cluster_dict = None
 
@@ -120,92 +95,87 @@ class LogParser:
 
         for idx, line in self.df_log.iterrows():
             log_content = line['Content']
-            # inline
-            for currentRex in self.rex:
-                log_content = re.sub(currentRex, '<$>', log_content)
-            if self.dataset.value == 'linux':
-                log_content = re.sub('\s+', ' ', log_content)
-            # log_content = self.preprocess(line['Content'])
+            log_content = self.preprocess(log_content).strip()
 
-            # log_token_list = log_split(log_content)
-            log_token_list = delimiter.split(log_content)
+            log_token_list = DELIMITER.split(log_content)
 
-            log_sig = log_signature(log_token_list)
-            # log_sig = 100 + len(log_token_list)  # length feature
-            # log_sig = log_sig * 10 + len(log_token_list[0])
+            log_sig = log_signature(log_content, log_token_list)
 
             log_cluster = self.log_cluster_dict[log_sig]
             template_idx, template_token_list = self.search(log_cluster, log_token_list)
             if template_idx == -1:
-                # template_idx = self.add_template(log_cluster, log_token_list)
-                log_cluster.template_list.append(log_token_list)
-                template_idx = len(log_cluster.template_list) - 1
+                template_idx = self.add_template(log_cluster, log_token_list)
             else:
-                # updated_template = self.new_template_from(log_token_list, template_token_list)
-                # self.update_template(log_cluster, updated_template, template_idx)
-                new_token_list = []
-                for t1, t2 in zip(log_token_list, template_token_list):
-                    if t1 == t2:
-                        new_token_list.append(t1)
-                    else:
-                        new_token_list.append(VAR)
-                log_cluster.template_list[template_idx] = new_token_list
+                updated_template = self.new_template_from(log_token_list, template_token_list)
+                self.update_template(log_cluster, updated_template, template_idx)
 
             this_eventId = log_sig * 1000 + template_idx
-            eventId_list.append(str(this_eventId))
+            eventId_list.append(this_eventId)
 
             count = idx + 1
             if count % 1000 == 0:
                 print('Processed {0:.1f}% of log lines.'.format(count * 100.0 / len(self.df_log)))
 
         self.dump_result(eventId_list)
-
         time_elapsed = datetime.now() - start_time
         print('Parsing done. [Time taken: {!s}]'.format(time_elapsed))
         return time_elapsed, self.out_path
 
     def preprocess(self, log_content: str) -> str:
-        for currentRex in self.rex:
-            log_content = re.sub(currentRex, '<$>', log_content)
-        # 替换连续空格
-        line = re.sub('\s+', ' ', log_content)
-        return line
-
-    def log_sim(self, token_list1: list, token_list2: list) -> float:
-        m, n = len(token_list1), len(token_list2)
-        if m != n:
-            return 0
-        # 利用前缀信息
-        for i in range(min(self.pre, n)):
-            if token_list1[i] != token_list2[i]:
-                return 0
-        count = self.pre
-        for i in range(self.pre, n):
-            # if token_list1[i] == VAR or token_list2[i] == VAR or token_list1[i] == token_list2[i]:
-            #     count += 1
-            # 符号否决
-            isDel1 = token_list1[i] in DELIMITERS
-            isDel2 = token_list2[i] in DELIMITERS
-            if not isDel1 and not isDel2:
-                if token_list1[i] == VAR or token_list2[i] == VAR or token_list1[i] == token_list2[i]:
-                    count += 1
-            elif isDel1 or isDel2:
-                if token_list1[i] == token_list2[i]:
-                    count += 1
-                else:
-                    return 0
-        return count / m
+        for r in self.rex:
+            log_content = r.sub('<$>', log_content)
+        if self.dataset.value == 'Linux':
+            log_content = re.sub('\s+', ' ', log_content)
+        return log_content
 
     def search(self, log_cluster: LogCluster, token_list: List[str]) -> (int, List[str]):
+
+        def log_similarity(template_token_list: list, log_token_list: list) -> float:
+            m, n = len(template_token_list), len(log_token_list)
+            if m != n:
+                return 0
+            word_list1 = [w for w in template_token_list if w not in CHAR_DICT]
+            word_list2 = [w for w in log_token_list if w not in CHAR_DICT]
+            if len(word_list1) != len(word_list2):
+                return 0
+            size = len(word_list1)
+            for i in range(min(self.pre, size)):
+                if not hasNumbers(word_list2[i]) and word_list1[i] != word_list2[i] and word_list1[i] != VAR:
+                    return 0
+            intersect = set(word_list1) & set(word_list2)
+            return len(intersect) / len(word_list1)
+
+        # def log_similarity(template_token_list: list, log_token_list: list) -> float:
+        #     m, n = len(template_token_list), len(log_token_list)
+        #     if m != n:
+        #         return 0
+        #     word_list1 = [w for w in template_token_list if w not in CHAR_DICT]
+        #     word_list2 = [w for w in log_token_list if w not in CHAR_DICT]
+        #     # mark_list1 = [w for w in template_token_list if w in CHAR_DICT]
+        #     # mark_list2 = [w for w in log_token_list if w in CHAR_DICT]
+        #     # if mark_list1 != mark_list2:
+        #     #     return 0
+        #     if len(word_list1) != len(word_list2):
+        #         return 0
+        #     size = len(word_list1)
+        #     count = 0
+        #     for i in range(min(self.pre, size)):
+        #         if not hasNumbers(word_list2[i]) and word_list1[i] != word_list2[i] and word_list1[i] != VAR:
+        #             return 0
+        #     for i in range(size):
+        #         if word_list1[i] in [word_list2[i], VAR]:
+        #             count += 1
+        #     return count / size
+
         max_score = 0
         max_idx = -1
         for i, template in enumerate(log_cluster.template_list):
-            score = self.log_sim(template, token_list)
+            score = log_similarity(template, token_list)
             if score > max_score:
                 max_idx = i
                 max_score = score
 
-        if max_score > self.st:
+        if max_score >= self.st:
             return max_idx, log_cluster.template_list[max_idx]
         return -1, None
 
@@ -227,8 +197,6 @@ class LogParser:
         log_cluster.template_list[idx] = token_list
 
     def dump_result(self, eventId_list):
-        if not eventId_list:
-            return
         out_dir = os.path.dirname(self.out_path)
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
@@ -273,6 +241,4 @@ class LogParser:
             return log_df
 
         headers, regex = generate_log_format_regex(self.log_format)
-        print('Regex generated.')
         self.df_log = log_to_dataframe(self.in_path, regex, headers)
-        print('Data loaded.')
