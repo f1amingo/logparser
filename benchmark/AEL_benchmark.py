@@ -148,20 +148,21 @@ if __name__ == '__main__':
         parser = AEL.LogParser(log_format=setting['log_format'], indir=indir, outdir=output_dir,
                                minEventCount=setting['minEventCount'], merge_percent=setting['merge_percent'],
                                rex=setting['regex'])
-        parser.parse(log_file)
+        time_elapsed = parser.parse(log_file)
 
         F1_measure, accuracy = evaluator.evaluate(
             groundtruth=os.path.join(indir, log_file + '_structured.csv'),
             parsedresult=os.path.join(output_dir, log_file + '_structured.csv')
         )
-        benchmark_result.append([dataset, F1_measure, accuracy])
+        benchmark_result.append([dataset, F1_measure, accuracy, time_elapsed.total_seconds()])
 
     print('\n=== Overall evaluation results ===')
-    df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
+    df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy', 'Time'])
     df_result.set_index('Dataset', inplace=True)
     print(df_result)
 
     accuracy_list = list(map(str, list(df_result['Accuracy'])))
     print('\t'.join(accuracy_list))
-
     df_result.T.to_csv('AEL_benchmark_result.csv')
+
+    print('\t'.join(list(map(str, list(df_result['Time'])))))

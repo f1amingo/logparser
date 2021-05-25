@@ -123,28 +123,29 @@ benchmark_settings = {
     },
 }
 
-benchmark_result = []
-for dataset, setting in benchmark_settings.items():
-    print('\n=== Evaluation on %s ===' % dataset)
-    indir = os.path.join(input_dir, os.path.dirname(setting['log_file']))
-    log_file = os.path.basename(setting['log_file'])
+if __name__ == '__main__':
+    benchmark_result = []
+    for dataset, setting in benchmark_settings.items():
+        print('\n=== Evaluation on %s ===' % dataset)
+        indir = os.path.join(input_dir, os.path.dirname(setting['log_file']))
+        log_file = os.path.basename(setting['log_file'])
 
-    parser = LenMa.LogParser(log_format=setting['log_format'], indir=indir, outdir=output_dir, rex=setting['regex'],
-                             threshold=setting['threshold'])
-    parser.parse(log_file)
+        parser = LenMa.LogParser(log_format=setting['log_format'], indir=indir, outdir=output_dir, rex=setting['regex'],
+                                 threshold=setting['threshold'])
+        parser.parse(log_file)
 
-    F1_measure, accuracy = evaluator.evaluate(
-        groundtruth=os.path.join(indir, log_file + '_structured.csv'),
-        parsedresult=os.path.join(output_dir, log_file + '_structured.csv')
-    )
-    benchmark_result.append([dataset, F1_measure, accuracy])
+        F1_measure, accuracy = evaluator.evaluate(
+            groundtruth=os.path.join(indir, log_file + '_structured.csv'),
+            parsedresult=os.path.join(output_dir, log_file + '_structured.csv')
+        )
+        benchmark_result.append([dataset, F1_measure, accuracy])
 
-print('\n=== Overall evaluation results ===')
-df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
-df_result.set_index('Dataset', inplace=True)
-print(df_result)
+    print('\n=== Overall evaluation results ===')
+    df_result = pd.DataFrame(benchmark_result, columns=['Dataset', 'F1_measure', 'Accuracy'])
+    df_result.set_index('Dataset', inplace=True)
+    print(df_result)
 
-accuracy_list = list(map(str, list(df_result['Accuracy'])))
-print('\t'.join(accuracy_list))
+    accuracy_list = list(map(str, list(df_result['Accuracy'])))
+    print('\t'.join(accuracy_list))
 
-df_result.T.to_csv('Lenma_benchmark_result.csv')
+    df_result.T.to_csv('Lenma_benchmark_result.csv')

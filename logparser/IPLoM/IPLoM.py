@@ -65,7 +65,7 @@ class Para:
 
 class LogParser:
     def __init__(self, log_format, indir='../logs/', outdir='./result/',
-                 maxEventLen=200, step2Support=0, PST=0,
+                 maxEventLen=500, step2Support=0, PST=0,
                  CT=0.35, lowerBound=0.25, upperBound=0.9,
                  rex=[], keep_para=True):
 
@@ -122,9 +122,12 @@ class LogParser:
             wordSeq.append(str(lineCount))
             lineCount += 1
 
-            # Add current log to the corresponding partition
-            self.partitionsL[len(wordSeq) - 1].logLL.append(wordSeq)
-            self.partitionsL[len(wordSeq) - 1].numOfLogs += 1
+            try:
+                # Add current log to the corresponding partition
+                self.partitionsL[len(wordSeq) - 1].logLL.append(wordSeq)
+                self.partitionsL[len(wordSeq) - 1].numOfLogs += 1
+            except:
+                print(wordSeq)
 
         for partition in self.partitionsL:
             if partition.numOfLogs == 0:

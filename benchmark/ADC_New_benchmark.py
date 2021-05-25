@@ -14,9 +14,9 @@ class ADCConfig:
 CONFIG_DICT = collections.defaultdict(ADCConfig)
 
 CONFIG_DICT[DATASET.Android].rex = [
-    r'(/[\w-]+)+',
+    # r'(/[\w-]+)+',
     r'([\w-]+\.){2,}[\w-]+',
-    r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'
+    # r'\b(\-?\+?\d+)\b|\b0[Xx][a-fA-F\d]+\b|\b[a-fA-F\d]{4,}\b'
 ]
 CONFIG_DICT[DATASET.Android].st = 0.1
 CONFIG_DICT[DATASET.Android].pre = 5

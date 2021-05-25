@@ -65,7 +65,9 @@ class LogParser:
         self.categorize()
         self.reconcile()
         self.dump()
-        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
+        time = datetime.now() - start_time
+        print('Parsing done. [Time taken: {!s}]'.format(time))
+        return time
 
     def tokenize(self):
         """
@@ -75,6 +77,7 @@ class LogParser:
             para_count = 0
 
             tokens = log.split()
+            # tokens = re.split('\s', log)
             for token in tokens:
                 if token == "<*>":
                     para_count += 1

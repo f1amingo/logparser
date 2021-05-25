@@ -12,6 +12,7 @@ import hashlib
 from collections import defaultdict
 from datetime import datetime
 
+
 class LogParser(object):
     def __init__(self, indir, outdir, log_format, threshold=0.9, predefined_templates=None, rex=[]):
         self.path = indir
@@ -21,7 +22,8 @@ class LogParser(object):
         self.wordseqs = []
         self.df_log = pd.DataFrame()
         self.wordpos_count = defaultdict(int)
-        self.templ_mgr = lenma_template.LenmaTemplateManager(threshold=threshold, predefined_templates=predefined_templates)
+        self.templ_mgr = lenma_template.LenmaTemplateManager(threshold=threshold,
+                                                             predefined_templates=predefined_templates)
         self.logname = None
 
     def parse(self, logname):
@@ -37,8 +39,10 @@ class LogParser(object):
                     line = re.sub(currentRex, '<*>', line)
             words = line.split()
             self.templ_mgr.infer_template(words, idx)
-        self.dump_results()
-        print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - starttime))
+        # self.dump_results()
+        time = datetime.now() - starttime
+        print('Parsing done. [Time taken: {!s}]'.format(time))
+        return time
 
     def dump_results(self):
         if not os.path.isdir(self.savePath):
@@ -59,9 +63,9 @@ class LogParser(object):
         self.df_log['EventId'] = template_ids
         self.df_log['EventTemplate'] = templates
 
-        pd.DataFrame(df_event, columns=['EventId', 'EventTemplate', 'Occurrences']).to_csv(os.path.join(self.savePath, self.logname + '_templates.csv'), index=False)
+        pd.DataFrame(df_event, columns=['EventId', 'EventTemplate', 'Occurrences']).to_csv(
+            os.path.join(self.savePath, self.logname + '_templates.csv'), index=False)
         self.df_log.to_csv(os.path.join(self.savePath, self.logname + '_structured.csv'), index=False)
-
 
     def log_to_dataframe(self, log_file, regex, headers, logformat):
         ''' Function to transform log file to dataframe '''
